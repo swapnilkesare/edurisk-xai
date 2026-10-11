@@ -170,16 +170,26 @@ def main():
         print(f" -> Page verified: {pm} ({fn} found)")
 
     # STEP 7: Verify Authentication & Role Access
-    print("\n[CHECK 7] Verifying PBKDF2 Authentication & Multi-Tenancy Scoping...")
-    from services.auth_service import authenticate_user, seed_default_auth, get_scoped_students
+    print("\n[CHECK 7] Verifying PBKDF2 Authentication, Multi-Tenancy Scoping & Demo Accounts...")
+    from services.auth_service import authenticate_user, seed_default_auth, get_scoped_students, DEMO_ACCOUNTS
+    from database.models import User
     db = SessionLocal()
     try:
         seed_default_auth(db)
-        teacher = authenticate_user(db, "teacher1", "Teacher@123")
-        assert teacher is not None, "Teacher authentication failed"
-        assert teacher.role == "TEACHER"
-        scoped_students = get_scoped_students(db, teacher)
-        print(f" -> Teacher1 Authenticated: Role={teacher.role}, Org={teacher.organization.name}, Scoped Students={len(scoped_students)}")
+        
+        # Verify all 4 demo accounts authenticate correctly
+        for demo_cfg in DEMO_ACCOUNTS:
+            u = authenticate_user(db, demo_cfg["username"], demo_cfg["default_password"])
+            assert u is not None, f"Authentication failed for demo user {demo_cfg['username']}"
+            assert u.role == demo_cfg["role"], f"Role mismatch for {demo_cfg['username']}"
+            org_desc = u.organization.name if u.organization else "Global System"
+            print(f" -> Verified Demo User: {u.username} ({u.full_name}) | Role={u.role} | Org={org_desc}")
+        
+        # Verify idempotency: run seed again
+        initial_users = db.query(User).count()
+        seed_default_auth(db)
+        assert db.query(User).count() == initial_users, "Seeding must be strictly idempotent"
+        print(f" -> Idempotency Verified: Account count ({initial_users}) preserved across re-seeds.")
     finally:
         db.close()
 

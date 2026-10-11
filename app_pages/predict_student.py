@@ -65,7 +65,7 @@ def render_predict_student(prediction_service, current_user=None):
         """, unsafe_allow_html=True)
     with col_hdr_back:
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("🏠 Return to Home", use_container_width=True, key="top_back_to_home_btn"):
+        if st.button("🏠 Return to Home", use_container_width=True, key="top_back_to_home_btn", type="secondary"):
             st.session_state.current_page = "🏠 Home"
             st.rerun()
 
@@ -95,7 +95,7 @@ def render_predict_student(prediction_service, current_user=None):
                 help="Select an example profile to test the assessment or choose Custom Student Record to enter your own."
             )
         with col_reset:
-            if st.button("🔄 Clear Form", use_container_width=True, key="clear_assessment_form_btn"):
+            if st.button("🔄 Clear Form", use_container_width=True, key="clear_assessment_form_btn", type="secondary"):
                 st.session_state.pop("current_prediction", None)
                 st.session_state.pop("selected_student_for_assessment", None)
                 st.rerun()
@@ -451,7 +451,7 @@ def render_predict_student(prediction_service, current_user=None):
                 st.session_state.pop("selected_student_for_assessment", None)
                 st.rerun()
         with col_home_bot:
-            if st.button("🏠 Return to Home", use_container_width=True, key="bottom_return_home_btn"):
+            if st.button("🏠 Return to Home", use_container_width=True, key="bottom_return_home_btn", type="secondary"):
                 st.session_state.pop("selected_student_for_assessment", None)
                 st.session_state.current_page = "🏠 Home"
                 st.rerun()

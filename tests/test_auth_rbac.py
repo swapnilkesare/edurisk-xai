@@ -35,18 +35,24 @@ def test_password_hashing_and_verification():
 def test_seed_users_and_authentication():
     db = SessionLocal()
     try:
-        # Teacher auth
-        teacher = authenticate_user(db, "teacher1", "Teacher@123")
-        assert teacher is not None
-        assert teacher.role == "TEACHER"
-        assert teacher.organization.code == "HORIZON"
+        # Teacher 1 auth (Horizon High School)
+        teacher1 = authenticate_user(db, "teacher1", "Teacher@123")
+        assert teacher1 is not None
+        assert teacher1.role == "TEACHER"
+        assert teacher1.organization.code == "HORIZON"
 
-        # Org Admin auth
+        # Teacher 2 auth (Apex Academy)
+        teacher2 = authenticate_user(db, "teacher2", "Teacher@123")
+        assert teacher2 is not None
+        assert teacher2.role == "TEACHER"
+        assert teacher2.organization.code == "APEX"
+
+        # Org Admin auth (Horizon High School)
         admin = authenticate_user(db, "orgadmin", "OrgAdmin@123")
         assert admin is not None
         assert admin.role == "ORG_ADMIN"
 
-        # Researcher / System Admin auth
+        # Researcher / System Admin auth (Global System)
         researcher = authenticate_user(db, "researcher", "Research@123")
         assert researcher is not None
         assert researcher.role == "SYSTEM_ADMIN"
@@ -54,6 +60,31 @@ def test_seed_users_and_authentication():
         # Failed auth
         failed = authenticate_user(db, "teacher1", "WrongPassword")
         assert failed is None
+    finally:
+        db.close()
+
+def test_seed_default_auth_idempotency():
+    """Verify that repeated seed_default_auth execution does not duplicate accounts or alter credentials."""
+    db = SessionLocal()
+    try:
+        initial_user_count = db.query(User).count()
+        initial_org_count = db.query(Organization).count()
+
+        # Capture initial password hashes
+        t1_initial = db.query(User).filter(User.username == "teacher1").first()
+        t1_hash = t1_initial.password_hash
+
+        # Run seed_default_auth multiple times
+        seed_default_auth(db)
+        seed_default_auth(db)
+
+        # User and Organization counts must remain identical (zero duplicates)
+        assert db.query(User).count() == initial_user_count
+        assert db.query(Organization).count() == initial_org_count
+
+        # Existing user password hashes must not be overwritten or changed
+        t1_after = db.query(User).filter(User.username == "teacher1").first()
+        assert t1_after.password_hash == t1_hash
     finally:
         db.close()
 

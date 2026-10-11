@@ -76,98 +76,121 @@ def log_audit_event(
     db.commit()
     return log_entry
 
+# ============================================================================
+# CENTRALIZED DEMO ACCOUNTS REGISTRY
+# Source of truth for pre-configured development and demonstration access
+# ============================================================================
+DEMO_ACCOUNTS: List[Dict[str, Any]] = [
+    {
+        "username": "teacher1",
+        "email": "clara.reed@horizon.edu",
+        "default_password": "Teacher@123",
+        "full_name": "Ms. Clara Reed",
+        "role": "TEACHER",
+        "org_code": "HORIZON",
+        "org_name": "Horizon High School",
+        "label": "🧑‍🏫 Teacher 1",
+        "badge": "Educator (Horizon)",
+        "scope": "Teacher workflow scoped to Horizon High School student cohort"
+    },
+    {
+        "username": "teacher2",
+        "email": "david.vance@apex.edu",
+        "default_password": "Teacher@123",
+        "full_name": "Mr. David Vance",
+        "role": "TEACHER",
+        "org_code": "APEX",
+        "org_name": "Apex Academy",
+        "label": "🧑‍🏫 Teacher 2",
+        "badge": "Educator (Apex)",
+        "scope": "Teacher workflow scoped to Apex Academy student cohort"
+    },
+    {
+        "username": "orgadmin",
+        "email": "arthur.vance@horizon.edu",
+        "default_password": "OrgAdmin@123",
+        "full_name": "Principal Arthur Vance",
+        "role": "ORG_ADMIN",
+        "org_code": "HORIZON",
+        "org_name": "Horizon High School",
+        "label": "🏫 Org Admin",
+        "badge": "Institutional Admin",
+        "scope": "Educator dashboard + student roster registration & management"
+    },
+    {
+        "username": "researcher",
+        "email": "elena.rostova@edurisk-research.org",
+        "default_password": "Research@123",
+        "full_name": "Dr. Elena Rostova",
+        "role": "SYSTEM_ADMIN",
+        "org_code": None,
+        "org_name": "Global Research System",
+        "label": "🔬 Researcher",
+        "badge": "Lead AI Researcher",
+        "scope": "Global cohort access + protected Research & Admin Tools"
+    }
+]
+
 def seed_default_auth(db: Session):
     """
     Ensures default organizations and demonstration role accounts exist in SQLite database.
-    Seeds are securely hashed with individual unique salts.
+    Strictly idempotent:
+    - Never duplicates organizations or users across restarts or multiple executions.
+    - Never overwrites an existing user's password or salt.
+    - Hashes initial default passwords with unique cryptographic salts using PBKDF2-HMAC-SHA256.
     """
-    # 1. Organizations
-    org_count = db.query(Organization).count()
-    if org_count == 0:
-        org1 = Organization(
-            name="Horizon High School",
-            code="HORIZON",
-            description="Public Secondary Academic Institution (District 4)",
-            created_at=datetime.utcnow()
-        )
-        org2 = Organization(
-            name="Apex Academy",
-            code="APEX",
-            description="STEM & Technical Preparatory Institute",
-            created_at=datetime.utcnow()
-        )
-        db.add_all([org1, org2])
-        db.commit()
+    # 1. Organizations: Ensure both default organizations exist idempotently
+    default_orgs = [
+        ("HORIZON", "Horizon High School", "Public Secondary Academic Institution (District 4)"),
+        ("APEX", "Apex Academy", "STEM & Technical Preparatory Institute")
+    ]
+    for code, name, desc in default_orgs:
+        existing_org = db.query(Organization).filter(Organization.code == code).first()
+        if not existing_org:
+            new_org = Organization(
+                name=name,
+                code=code,
+                description=desc,
+                created_at=datetime.utcnow()
+            )
+            db.add(new_org)
+    db.commit()
 
-    horizon_org = db.query(Organization).filter(Organization.code == "HORIZON").first()
-    apex_org = db.query(Organization).filter(Organization.code == "APEX").first()
+    # Build code-to-id mapping for organizations
+    org_map = {org.code: org.id for org in db.query(Organization).all()}
 
-    # 2. Users
-    user_count = db.query(User).count()
-    if user_count == 0:
-        # Default Teacher 1 (Horizon)
-        p1_hash, s1 = hash_password("Teacher@123")
-        u1 = User(
-            username="teacher1",
-            email="clara.reed@horizon.edu",
-            password_hash=p1_hash,
-            salt=s1,
-            full_name="Ms. Clara Reed",
-            role="TEACHER",
-            organization_id=horizon_org.id if horizon_org else None,
-            is_active=True
-        )
+    # 2. Users: Idempotently ensure each demo account exists without overwriting existing accounts
+    for demo_cfg in DEMO_ACCOUNTS:
+        uname = demo_cfg["username"]
+        existing_user = db.query(User).filter(User.username == uname).first()
+        if not existing_user:
+            p_hash, salt = hash_password(demo_cfg["default_password"])
+            org_id = org_map.get(demo_cfg["org_code"]) if demo_cfg["org_code"] else None
+            new_user = User(
+                username=uname,
+                email=demo_cfg["email"],
+                password_hash=p_hash,
+                salt=salt,
+                full_name=demo_cfg["full_name"],
+                role=demo_cfg["role"],
+                organization_id=org_id,
+                is_active=True
+            )
+            db.add(new_user)
+        else:
+            # User already exists; preserve their existing password, credentials, and settings
+            pass
+    db.commit()
 
-        # Default Teacher 2 (Apex)
-        p2_hash, s2 = hash_password("Teacher@123")
-        u2 = User(
-            username="teacher2",
-            email="david.vance@apex.edu",
-            password_hash=p2_hash,
-            salt=s2,
-            full_name="Mr. David Vance",
-            role="TEACHER",
-            organization_id=apex_org.id if apex_org else None,
-            is_active=True
-        )
-
-        # Default Organization Administrator (Horizon)
-        p3_hash, s3 = hash_password("OrgAdmin@123")
-        u3 = User(
-            username="orgadmin",
-            email="arthur.vance@horizon.edu",
-            password_hash=p3_hash,
-            salt=s3,
-            full_name="Principal Arthur Vance",
-            role="ORG_ADMIN",
-            organization_id=horizon_org.id if horizon_org else None,
-            is_active=True
-        )
-
-        # Default System Administrator / AI Lead Researcher (Global)
-        p4_hash, s4 = hash_password("Research@123")
-        u4 = User(
-            username="researcher",
-            email="elena.rostova@edurisk-research.org",
-            password_hash=p4_hash,
-            salt=s4,
-            full_name="Dr. Elena Rostova",
-            role="SYSTEM_ADMIN",
-            organization_id=None,
-            is_active=True
-        )
-
-        db.add_all([u1, u2, u3, u4])
-        db.commit()
-
-    # 3. Attach existing unassigned students to Horizon High School for immediate demonstration
-    if horizon_org:
+    # 3. Attach unassigned demonstration students to Horizon High School for immediate cohort view
+    horizon_id = org_map.get("HORIZON")
+    if horizon_id:
         db.query(Student).filter(Student.organization_id == None).update(
-            {"organization_id": horizon_org.id},
+            {"organization_id": horizon_id},
             synchronize_session=False
         )
         db.query(Prediction).filter(Prediction.organization_id == None).update(
-            {"organization_id": horizon_org.id},
+            {"organization_id": horizon_id},
             synchronize_session=False
         )
         db.commit()

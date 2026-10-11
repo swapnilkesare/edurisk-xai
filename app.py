@@ -22,11 +22,17 @@ from config.theme import (
     COLOR_ACCENT_VIOLET,
     COLOR_TEXT_PRIMARY,
     COLOR_TEXT_SECONDARY,
-    COLOR_BORDER
+    COLOR_BORDER,
+    COLOR_BORDER_SUBTLE
 )
 from database.database import init_db, SessionLocal
 from database.crud import seed_default_rules_if_empty
-from services.auth_service import seed_default_auth, authenticate_user, log_audit_event
+from services.auth_service import (
+    seed_default_auth,
+    authenticate_user,
+    log_audit_event,
+    DEMO_ACCOUNTS
+)
 from services.prediction_service import PredictionService
 from services.training_service import TrainingService
 from services.import_service import ImportService
@@ -137,64 +143,68 @@ if st.session_state.current_user is None:
 
             st.markdown("<br>", unsafe_allow_html=True)
 
-            # Quick Role Demonstration Access
+            # Quick Role Demonstration Access (All 4 Demo Accounts)
             with st.expander("⚡ Quick Demonstration Role Access (Reviewer Logins)", expanded=True):
                 st.caption("Select a pre-configured role to immediately test the platform:")
-                q1, q2, q3 = st.columns(3)
-                with q1:
-                    if st.button("🧑‍🏫 Teacher", use_container_width=True, help="Teacher at Horizon High School"):
-                        db = SessionLocal()
-                        try:
-                            user = authenticate_user(db, "teacher1", "Teacher@123")
-                            if user:
-                                org_name = user.organization.name if user.organization else "Horizon High School"
-                                st.session_state.current_user = {
-                                    "id": user.id,
-                                    "username": user.username,
-                                    "full_name": user.full_name,
-                                    "role": user.role,
-                                    "organization_id": user.organization_id,
-                                    "organization_name": org_name
-                                }
-                                st.rerun()
-                        finally:
-                            db.close()
-                with q2:
-                    if st.button("🏫 Org Admin", use_container_width=True, help="Administrator at Horizon High School"):
-                        db = SessionLocal()
-                        try:
-                            user = authenticate_user(db, "orgadmin", "OrgAdmin@123")
-                            if user:
-                                org_name = user.organization.name if user.organization else "Horizon High School"
-                                st.session_state.current_user = {
-                                    "id": user.id,
-                                    "username": user.username,
-                                    "full_name": user.full_name,
-                                    "role": user.role,
-                                    "organization_id": user.organization_id,
-                                    "organization_name": org_name
-                                }
-                                st.rerun()
-                        finally:
-                            db.close()
-                with q3:
-                    if st.button("🔬 Researcher", use_container_width=True, help="Lead AI Researcher (Full Research Access)"):
-                        db = SessionLocal()
-                        try:
-                            user = authenticate_user(db, "researcher", "Research@123")
-                            if user:
-                                org_name = user.organization.name if user.organization else "Global Research System"
-                                st.session_state.current_user = {
-                                    "id": user.id,
-                                    "username": user.username,
-                                    "full_name": user.full_name,
-                                    "role": user.role,
-                                    "organization_id": user.organization_id,
-                                    "organization_name": org_name
-                                }
-                                st.rerun()
-                        finally:
-                            db.close()
+                demo_cols = st.columns(len(DEMO_ACCOUNTS))
+                for d_idx, demo_cfg in enumerate(DEMO_ACCOUNTS):
+                    with demo_cols[d_idx]:
+                        if st.button(demo_cfg["label"], key=f"demo_login_btn_{d_idx}", use_container_width=True, help=demo_cfg["scope"]):
+                            db = SessionLocal()
+                            try:
+                                user = authenticate_user(db, demo_cfg["username"], demo_cfg["default_password"])
+                                if user:
+                                    org_name = user.organization.name if user.organization else (demo_cfg.get("org_name") or "Global System")
+                                    st.session_state.current_user = {
+                                        "id": user.id,
+                                        "username": user.username,
+                                        "full_name": user.full_name,
+                                        "role": user.role,
+                                        "organization_id": user.organization_id,
+                                        "organization_name": org_name
+                                    }
+                                    st.rerun()
+                            finally:
+                                db.close()
+
+                st.markdown("<br>", unsafe_allow_html=True)
+                st.markdown(f"""
+                <div style="background-color: {COLOR_BG_SECONDARY}; border: 1px solid {COLOR_BORDER}; border-radius: 8px; padding: 0.85rem 1rem;">
+                    <strong style="color: {COLOR_ACCENT_TEAL}; font-size: 0.9rem;">📋 Pre-Configured Test Credentials:</strong>
+                    <table style="width: 100%; margin-top: 0.5rem; font-size: 0.82rem; color: {COLOR_TEXT_SECONDARY}; border-collapse: collapse;">
+                        <tr style="border-bottom: 1px solid {COLOR_BORDER}; text-align: left; color: {COLOR_TEXT_PRIMARY};">
+                            <th style="padding: 4px 6px;">Role</th>
+                            <th style="padding: 4px 6px;">Username</th>
+                            <th style="padding: 4px 6px;">Password</th>
+                            <th style="padding: 4px 6px;">Institution</th>
+                        </tr>
+                        <tr style="border-bottom: 1px solid {COLOR_BORDER_SUBTLE};">
+                            <td style="padding: 4px 6px;"><strong style="color: {COLOR_TEXT_PRIMARY};">Teacher 1</strong></td>
+                            <td style="padding: 4px 6px;"><code>teacher1</code></td>
+                            <td style="padding: 4px 6px;"><code>Teacher@123</code></td>
+                            <td style="padding: 4px 6px;">Horizon High School</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid {COLOR_BORDER_SUBTLE};">
+                            <td style="padding: 4px 6px;"><strong style="color: {COLOR_TEXT_PRIMARY};">Teacher 2</strong></td>
+                            <td style="padding: 4px 6px;"><code>teacher2</code></td>
+                            <td style="padding: 4px 6px;"><code>Teacher@123</code></td>
+                            <td style="padding: 4px 6px;">Apex Academy</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid {COLOR_BORDER_SUBTLE};">
+                            <td style="padding: 4px 6px;"><strong style="color: {COLOR_TEXT_PRIMARY};">Org Admin</strong></td>
+                            <td style="padding: 4px 6px;"><code>orgadmin</code></td>
+                            <td style="padding: 4px 6px;"><code>OrgAdmin@123</code></td>
+                            <td style="padding: 4px 6px;">Horizon High School</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px;"><strong style="color: {COLOR_ACCENT_VIOLET};">Researcher</strong></td>
+                            <td style="padding: 4px 6px;"><code>researcher</code></td>
+                            <td style="padding: 4px 6px;"><code>Research@123</code></td>
+                            <td style="padding: 4px 6px;">Global System</td>
+                        </tr>
+                    </table>
+                </div>
+                """, unsafe_allow_html=True)
 
     st.stop()
 
@@ -222,13 +232,13 @@ current_user = CurrentUserProxy(st.session_state.current_user)
 # 2. HORIZONTAL TOP NAVIGATION BAR (MATTE BLACK / ELECTRIC TEAL)
 # ============================================================================
 st.markdown('<div class="edurisk-navbar-container">', unsafe_allow_html=True)
-top_cols = st.columns([1.8, 5.0, 2.2])
+top_cols = st.columns([1.6, 5.4, 2.0])
 
 with top_cols[0]:
     st.markdown(f"""
-    <div style="display: flex; align-items: center; gap: 8px; padding-top: 4px;">
-        <span style="font-size: 1.55rem; font-weight: 800; color: {COLOR_ACCENT_TEAL}; letter-spacing: -0.5px;">🎓 EduRisk</span>
-        <span style="font-size: 0.75rem; background-color: {COLOR_BG_SECONDARY}; color: {COLOR_TEXT_SECONDARY}; padding: 3px 8px; border-radius: 6px; border: 1px solid {COLOR_BORDER}; font-weight: 500;">
+    <div style="display: flex; align-items: center; gap: 8px; padding-top: 4px; flex-wrap: wrap;">
+        <span style="font-size: 1.55rem; font-weight: 800; color: {COLOR_ACCENT_TEAL}; letter-spacing: -0.5px; white-space: nowrap;">🎓 EduRisk</span>
+        <span style="font-size: 0.75rem; background-color: {COLOR_BG_SECONDARY}; color: {COLOR_TEXT_SECONDARY}; padding: 3px 8px; border-radius: 6px; border: 1px solid {COLOR_BORDER}; font-weight: 500; white-space: nowrap; max-width: 140px; overflow: hidden; text-overflow: ellipsis;">
             {current_user.organization_name[:16]}
         </span>
     </div>
@@ -255,7 +265,7 @@ with top_cols[1]:
                 st.rerun()
 
 with top_cols[2]:
-    user_col1, user_col2 = st.columns([2.5, 1.2])
+    user_col1, user_col2 = st.columns([2.0, 1.2])
     with user_col1:
         role_badge = {
             "TEACHER": "Educator",
@@ -263,13 +273,13 @@ with top_cols[2]:
             "SYSTEM_ADMIN": "Lead Researcher"
         }.get(current_user.role, current_user.role)
         st.markdown(f"""
-        <div style="text-align: right; line-height: 1.2; padding-top: 4px;">
+        <div style="text-align: right; line-height: 1.2; padding-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
             <strong style="color: {COLOR_TEXT_PRIMARY}; font-size: 0.88rem;">{current_user.full_name}</strong><br>
             <span style="color: {COLOR_ACCENT_TEAL}; font-size: 0.75rem; font-weight: 600;">{role_badge}</span>
         </div>
         """, unsafe_allow_html=True)
     with user_col2:
-        if st.button("🚪 Logout", key="logout_btn", use_container_width=True):
+        if st.button("🚪 Logout", key="logout_btn", type="secondary", use_container_width=True):
             db = SessionLocal()
             log_audit_event(db, current_user.id, current_user.username, "LOGOUT", "SESSION", "User signed out")
             db.close()
