@@ -39,16 +39,24 @@ def get_all_rules(db: Session, active_only: bool = True) -> List[InterventionRul
 def get_or_create_student(
     db: Session,
     student_identifier: str,
-    name: Optional[str] = None
+    name: Optional[str] = None,
+    organization_id: Optional[int] = None,
+    created_by_user_id: Optional[int] = None,
 ) -> Student:
     student = db.query(Student).filter(Student.student_identifier == student_identifier).first()
     if not student:
         student = Student(
             student_identifier=student_identifier,
             name=name or f"Student {student_identifier}",
+            organization_id=organization_id,
+            created_by_user_id=created_by_user_id,
             created_at=datetime.utcnow()
         )
         db.add(student)
+        db.commit()
+        db.refresh(student)
+    elif organization_id and not student.organization_id:
+        student.organization_id = organization_id
         db.commit()
         db.refresh(student)
     return student
@@ -65,15 +73,24 @@ def save_prediction_and_xai(
     input_data: Dict[str, Any],
     shap_explanation: Optional[Dict[str, Any]] = None,
     interventions: Optional[List[Dict[str, Any]]] = None,
+    organization_id: Optional[int] = None,
+    created_by_user_id: Optional[int] = None,
 ) -> Prediction:
     """Saves a complete inference audit record: Prediction -> SHAP -> Interventions."""
     student = None
     if student_identifier:
-        student = get_or_create_student(db, student_identifier)
+        student = get_or_create_student(
+            db, 
+            student_identifier,
+            organization_id=organization_id,
+            created_by_user_id=created_by_user_id
+        )
 
     prediction = Prediction(
         student_id=student.id if student else None,
         student_identifier=student_identifier,
+        organization_id=organization_id or (student.organization_id if student else None),
+        created_by_user_id=created_by_user_id,
         model_version=model_version,
         model_name=model_name,
         predicted_class=predicted_class,

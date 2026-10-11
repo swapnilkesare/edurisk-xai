@@ -1,5 +1,6 @@
 """
 SQLAlchemy ORM Entities for EduRisk XAI
+Includes Tenancy, User Authentication, Role-Based Access Control, and Audit Logging
 """
 from datetime import datetime
 from sqlalchemy import (
@@ -7,6 +8,56 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from database.database import Base
+
+
+class Organization(Base):
+    """Educational Institution / School / Academy Tenancy Entity."""
+    __tablename__ = "organizations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(128), unique=True, nullable=False)
+    code = Column(String(32), unique=True, index=True, nullable=False)
+    description = Column(String(256), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    users = relationship("User", back_populates="organization", cascade="all, delete-orphan")
+    students = relationship("Student", back_populates="organization")
+
+
+class User(Base):
+    """User Account Entity with PBKDF2 Hashing and Role-Based Permissions."""
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(64), unique=True, index=True, nullable=False)
+    email = Column(String(128), unique=True, index=True, nullable=False)
+    password_hash = Column(String(128), nullable=False)
+    salt = Column(String(64), nullable=False)
+    full_name = Column(String(128), nullable=False)
+    role = Column(String(32), nullable=False, default="TEACHER")  # TEACHER, ORG_ADMIN, SYSTEM_ADMIN
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    last_login = Column(DateTime, nullable=True)
+
+    organization = relationship("Organization", back_populates="users")
+    audit_logs = relationship("AuditLog", back_populates="user")
+
+
+class AuditLog(Base):
+    """System and Student Data Access Audit Log Entity."""
+    __tablename__ = "audit_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    username = Column(String(64), nullable=False)
+    action = Column(String(64), nullable=False)     # LOGIN, LOGOUT, PREDICTION, ACCESS_DENIED, etc.
+    resource = Column(String(64), nullable=False)   # STUDENT, PREDICTION, MODEL_RUN, etc.
+    details = Column(Text, nullable=True)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", back_populates="audit_logs")
+
 
 class Student(Base):
     __tablename__ = "students"
@@ -18,9 +69,12 @@ class Student(Base):
     department = Column(String(64), default="Engineering")
     semester = Column(Integer, default=3)
     year = Column(Integer, default=2)
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
+    created_by_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    organization = relationship("Organization", back_populates="students")
     predictions = relationship("Prediction", back_populates="student", cascade="all, delete-orphan")
     interventions = relationship("Intervention", back_populates="student", cascade="all, delete-orphan")
 
@@ -57,6 +111,8 @@ class Prediction(Base):
     id = Column(Integer, primary_key=True, index=True)
     student_id = Column(Integer, ForeignKey("students.id"), nullable=True)
     student_identifier = Column(String(64), nullable=True)
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
+    created_by_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     model_version = Column(String(64), nullable=False)
     model_name = Column(String(64), nullable=False)
     prediction_timestamp = Column(DateTime, default=datetime.utcnow)

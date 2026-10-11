@@ -149,14 +149,16 @@ def main():
     finally:
         db.close()
 
-    # STEP 6: Verify All 9 Dashboard Pages
-    print("\n[CHECK 6] Verifying All 9 Streamlit Dashboard Pages...")
+    # STEP 6: Verify All 11 Dashboard Pages
+    print("\n[CHECK 6] Verifying All 11 Streamlit Dashboard Pages...")
     page_functions = [
         ("app_pages.dashboard", "render_dashboard"),
+        ("app_pages.predict_student", "render_predict_student"),
+        ("app_pages.students", "render_students"),
+        ("app_pages.reports", "render_reports"),
         ("app_pages.data_import", "render_data_import"),
         ("app_pages.model_training", "render_model_training"),
         ("app_pages.model_comparison", "render_model_comparison"),
-        ("app_pages.predict_student", "render_predict_student"),
         ("app_pages.explainability", "render_explainability"),
         ("app_pages.interventions", "render_interventions"),
         ("app_pages.analytics", "render_analytics"),
@@ -166,6 +168,20 @@ def main():
         mod = __import__(pm, fromlist=[fn])
         assert hasattr(mod, fn), f"Page module {pm} missing {fn}() entry point!"
         print(f" -> Page verified: {pm} ({fn} found)")
+
+    # STEP 7: Verify Authentication & Role Access
+    print("\n[CHECK 7] Verifying PBKDF2 Authentication & Multi-Tenancy Scoping...")
+    from services.auth_service import authenticate_user, seed_default_auth, get_scoped_students
+    db = SessionLocal()
+    try:
+        seed_default_auth(db)
+        teacher = authenticate_user(db, "teacher1", "Teacher@123")
+        assert teacher is not None, "Teacher authentication failed"
+        assert teacher.role == "TEACHER"
+        scoped_students = get_scoped_students(db, teacher)
+        print(f" -> Teacher1 Authenticated: Role={teacher.role}, Org={teacher.organization.name}, Scoped Students={len(scoped_students)}")
+    finally:
+        db.close()
 
     print("\n" + "=" * 70)
     print("ALL RUNTIME VERIFICATION CHECKS PASSED WITH 100% SUCCESS!")

@@ -81,5 +81,7 @@ def test_streamlit_pages_import_smoke():
     import app_pages.interventions
     import app_pages.analytics
     import app_pages.research_traceability
+    import app_pages.students
+    import app_pages.reports
     assert True
 

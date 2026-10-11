@@ -84,7 +84,9 @@ class PredictionService:
         self,
         student_data: Union[Dict[str, Any], pd.DataFrame],
         student_identifier: Optional[str] = None,
-        save_to_db: bool = True
+        save_to_db: bool = True,
+        organization_id: Optional[int] = None,
+        created_by_user_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         """
         Executes complete inference workflow for a student.
@@ -135,6 +137,8 @@ class PredictionService:
                     input_data=pred_res["input_features"],
                     shap_explanation=shap_res,
                     interventions=interventions,
+                    organization_id=organization_id,
+                    created_by_user_id=created_by_user_id,
                 )
                 db_id = pred_row.id
                 db.close()
