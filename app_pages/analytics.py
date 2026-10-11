@@ -38,6 +38,8 @@ def render_analytics():
 
         col_c1, col_c2 = st.columns(2)
 
+        from config.theme import apply_dark_theme_to_plotly, COLOR_RISK_HIGH, COLOR_RISK_LOW, COLOR_ACCENT_TEAL, COLOR_BORDER
+
         with col_c1:
             st.subheader("Attendance vs. Internal Assessment")
             if "attendance_rate" in df.columns and "internal_test_score" in df.columns:
@@ -46,11 +48,12 @@ def render_analytics():
                     x="attendance_rate",
                     y="internal_test_score",
                     color=df[TARGET_COLUMN].map({0: "On-Track", 1: "At-Risk"}) if TARGET_COLUMN in df.columns else None,
-                    color_discrete_map={"On-Track": "#10b981", "At-Risk": "#ef4444"},
+                    color_discrete_map={"On-Track": COLOR_RISK_LOW, "At-Risk": COLOR_RISK_HIGH},
                     labels={"attendance_rate": "Attendance Rate (%)", "internal_test_score": "Internal Test Score (%)"},
                     title="Attendance vs. Assessment Performance"
                 )
                 fig_scatter.update_layout(margin=dict(l=20, r=20, t=30, b=20))
+                fig_scatter = apply_dark_theme_to_plotly(fig_scatter)
                 st.plotly_chart(fig_scatter, use_container_width=True)
 
         with col_c2:
@@ -61,11 +64,12 @@ def render_analytics():
                     x="study_hours",
                     nbins=20,
                     color=df[TARGET_COLUMN].map({0: "On-Track", 1: "At-Risk"}) if TARGET_COLUMN in df.columns else None,
-                    color_discrete_map={"On-Track": "#10b981", "At-Risk": "#ef4444"},
+                    color_discrete_map={"On-Track": COLOR_RISK_LOW, "At-Risk": COLOR_RISK_HIGH},
                     labels={"study_hours": "Study Hours / Week"},
                     title="Study Hours Distribution Across Risk Classes"
                 )
                 fig_hist.update_layout(margin=dict(l=20, r=20, t=30, b=20))
+                fig_hist = apply_dark_theme_to_plotly(fig_hist)
                 st.plotly_chart(fig_hist, use_container_width=True)
 
     # TAB 2: Longitudinal Trajectory
@@ -102,11 +106,13 @@ def render_analytics():
                         y="Raw Prob",
                         markers=True,
                         labels={"Raw Prob": "Predicted Failure Probability", "Timestamp": "Evaluation Date"},
-                        title=f"Risk Trajectory for {stu_search}"
+                        title=f"Risk Trajectory for {stu_search}",
+                        color_discrete_sequence=[COLOR_ACCENT_TEAL]
                     )
-                    fig_trend.add_hline(y=0.66, line_dash="dash", line_color="red", annotation_text="High Risk Threshold (0.66)")
-                    fig_trend.add_hline(y=0.33, line_dash="dash", line_color="orange", annotation_text="Moderate Risk Threshold (0.33)")
+                    fig_trend.add_hline(y=0.66, line_dash="dash", line_color=COLOR_RISK_HIGH, annotation_text="High Risk Threshold (0.66)")
+                    fig_trend.add_hline(y=0.33, line_dash="dash", line_color="#FFB238", annotation_text="Moderate Risk Threshold (0.33)")
                     fig_trend.update_layout(yaxis=dict(range=[0, 1.05]))
+                    fig_trend = apply_dark_theme_to_plotly(fig_trend)
                     st.plotly_chart(fig_trend, use_container_width=True)
 
                     st.dataframe(df_h[["Timestamp", "Risk Tier", "Probability", "Model Version"]], use_container_width=True)

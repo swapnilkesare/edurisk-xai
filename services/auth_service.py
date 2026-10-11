@@ -7,7 +7,7 @@ import hmac
 import secrets
 from datetime import datetime
 from typing import Optional, Tuple, List, Dict, Any
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from database.models import User, Organization, Student, Prediction, AuditLog
 
@@ -37,7 +37,7 @@ def verify_password(password: str, salt: str, expected_hash: str) -> bool:
 
 def authenticate_user(db: Session, username_or_email: str, password: str) -> Optional[User]:
     """Authenticates user credentials and records audit telemetry."""
-    user = db.query(User).filter(
+    user = db.query(User).options(joinedload(User.organization)).filter(
         (User.username == username_or_email.strip()) | 
         (User.email == username_or_email.strip())
     ).first()

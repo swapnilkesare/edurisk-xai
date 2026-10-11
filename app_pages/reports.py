@@ -7,17 +7,30 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
+from config.theme import (
+    apply_dark_theme_to_plotly,
+    COLOR_BG_CARD,
+    COLOR_BG_SECONDARY,
+    COLOR_ACCENT_TEAL,
+    COLOR_ACCENT_VIOLET,
+    COLOR_TEXT_PRIMARY,
+    COLOR_TEXT_SECONDARY,
+    COLOR_BORDER,
+    COLOR_RISK_HIGH,
+    COLOR_RISK_MODERATE,
+    COLOR_RISK_LOW
+)
 from database.database import SessionLocal
 from database.models import Prediction, Intervention
 from services.auth_service import get_scoped_predictions
 
 def render_reports(current_user=None):
-    st.markdown("""
-    <div style="padding: 0.5rem 0 1rem 0;">
-        <h1 style="color: var(--text-primary, #0f172a); font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem;">
+    st.markdown(f"""
+    <div style="padding: 0.25rem 0 0.75rem 0;">
+        <h1 style="color: {COLOR_TEXT_PRIMARY}; font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem;">
             📊 Academic Risk & Intervention Reports
         </h1>
-        <p style="color: var(--text-secondary, #475569); font-size: 1.05rem;">
+        <p style="color: {COLOR_TEXT_SECONDARY}; font-size: 1.05rem;">
             Aggregated institutional summaries to inform student advisory and academic support planning.
         </p>
     </div>
@@ -56,11 +69,10 @@ def render_reports(current_user=None):
         # Visualizations
         col_chart1, col_chart2 = st.columns(2)
         with col_chart1:
-            st.markdown("#### 🎯 Student Risk Tier Distribution")
+            st.markdown(f"<h4 style='color: {COLOR_TEXT_PRIMARY}; font-size: 1.15rem;'>🎯 Student Risk Tier Distribution</h4>", unsafe_allow_html=True)
             df_pie = pd.DataFrame({
                 "Risk Tier": ["Priority Support (High)", "Monitoring Advised (Mod)", "On Track (Low)"],
                 "Count": [high_cnt, mod_cnt, low_cnt],
-                "Color": ["#ef4444", "#f59e0b", "#10b981"]
             })
             fig_pie = px.pie(
                 df_pie,
@@ -68,35 +80,37 @@ def render_reports(current_user=None):
                 values="Count",
                 color="Risk Tier",
                 color_discrete_map={
-                    "Priority Support (High)": "#ef4444",
-                    "Monitoring Advised (Mod)": "#f59e0b",
-                    "On Track (Low)": "#10b981"
+                    "Priority Support (High)": COLOR_RISK_HIGH,
+                    "Monitoring Advised (Mod)": COLOR_RISK_MODERATE,
+                    "On Track (Low)": COLOR_RISK_LOW
                 },
-                hole=0.45
+                hole=0.48
             )
             fig_pie.update_layout(margin=dict(l=20, r=20, t=20, b=20), height=320)
+            fig_pie = apply_dark_theme_to_plotly(fig_pie)
             st.plotly_chart(fig_pie, use_container_width=True)
 
         with col_chart2:
-            st.markdown("#### 📈 Predicted Probability Histogram")
+            st.markdown(f"<h4 style='color: {COLOR_TEXT_PRIMARY}; font-size: 1.15rem;'>📈 Predicted Probability Histogram</h4>", unsafe_allow_html=True)
             probs = [p.probability for p in preds]
             fig_hist = px.histogram(
                 x=probs,
                 nbins=10,
                 labels={"x": "Estimated Risk Probability", "y": "Student Count"},
-                color_discrete_sequence=["#0284c7"]
+                color_discrete_sequence=[COLOR_ACCENT_TEAL]
             )
             fig_hist.update_layout(
                 margin=dict(l=20, r=20, t=20, b=20),
                 height=320,
                 xaxis=dict(tickformat=".0%")
             )
+            fig_hist = apply_dark_theme_to_plotly(fig_hist)
             st.plotly_chart(fig_hist, use_container_width=True)
 
-        st.markdown("---")
+        st.markdown(f"<hr style='border: none; border-top: 1px solid {COLOR_BORDER}; margin: 1.5rem 0;'>", unsafe_allow_html=True)
 
         # Recent Evaluation Records Table
-        st.markdown("### 📋 Recent Evaluation Logs")
+        st.markdown(f"<h3 style='color: {COLOR_TEXT_PRIMARY}; font-size: 1.25rem;'>📋 Recent Evaluation Logs</h3>", unsafe_allow_html=True)
         table_rows = []
         for p in preds[:30]:
             table_rows.append({

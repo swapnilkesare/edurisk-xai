@@ -1,7 +1,7 @@
 """
 EduRisk — Academic Risk Prediction, Explainability, and Decision Support Platform
-Modular, accessible Streamlit application with horizontal top navigation, role-based access control,
-and scoped institutional student risk intelligence.
+Modular, accessible Streamlit application with modern interactive dark UI,
+horizontal top navigation, role-based access control, and scoped institutional student risk intelligence.
 """
 import sys
 from pathlib import Path
@@ -13,6 +13,17 @@ if str(ROOT_DIR) not in sys.path:
 
 import streamlit as st
 
+from config.theme import (
+    inject_custom_theme,
+    COLOR_BG_MAIN,
+    COLOR_BG_CARD,
+    COLOR_BG_SECONDARY,
+    COLOR_ACCENT_TEAL,
+    COLOR_ACCENT_VIOLET,
+    COLOR_TEXT_PRIMARY,
+    COLOR_TEXT_SECONDARY,
+    COLOR_BORDER
+)
 from database.database import init_db, SessionLocal
 from database.crud import seed_default_rules_if_empty
 from services.auth_service import seed_default_auth, authenticate_user, log_audit_event
@@ -41,66 +52,8 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Adaptive Theme & High-Contrast CSS
-st.markdown("""
-<style>
-    :root {
-        --text-primary: #0f172a;
-        --text-secondary: #334155;
-        --text-muted: #64748b;
-        --bg-surface: #ffffff;
-        --bg-card: #f8fafc;
-        --border-color: #cbd5e1;
-        --brand-primary: #0284c7;
-        --brand-primary-hover: #0369a1;
-    }
-
-    @media (prefers-color-scheme: dark) {
-        :root {
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --text-muted: #94a3b8;
-            --bg-surface: #0f172a;
-            --bg-card: #1e293b;
-            --border-color: #334155;
-            --brand-primary: #38bdf8;
-            --brand-primary-hover: #0ea5e9;
-        }
-    }
-
-    /* Completely hide default left sidebar to enforce unified top navigation */
-    section[data-testid="stSidebar"] {
-        display: none !important;
-    }
-    div[data-testid="stSidebarCollapsedControl"] {
-        display: none !important;
-    }
-
-    /* Typography & Container Spacing */
-    .main {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    div.block-container {
-        padding-top: 1rem;
-        padding-bottom: 3rem;
-        max-width: 1400px;
-    }
-
-    /* Button Polish */
-    .stButton>button {
-        border-radius: 8px;
-        font-weight: 500;
-        transition: all 0.15s ease-in-out;
-    }
-
-    /* Navigation Bar Styling */
-    .edurisk-top-bar {
-        border-bottom: 2px solid var(--border-color, #e2e8f0);
-        padding-bottom: 0.75rem;
-        margin-bottom: 1.25rem;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Inject centralized modern dark UI theme
+st.markdown(inject_custom_theme(), unsafe_allow_html=True)
 
 # Initialize application database and services once
 @st.cache_resource
@@ -127,15 +80,15 @@ if "current_page" not in st.session_state:
 
 
 # ============================================================================
-# 1. AUTHENTICATION & LOGIN GATEWAY
+# 1. AUTHENTICATION & LOGIN GATEWAY (DARK UI)
 # ============================================================================
 if st.session_state.current_user is None:
-    st.markdown("""
-    <div style="text-align: center; padding: 2rem 0 1.5rem 0;">
-        <h1 style="color: var(--brand-primary, #0284c7); font-size: 2.8rem; font-weight: 800; margin-bottom: 0.25rem;">
+    st.markdown(f"""
+    <div style="text-align: center; padding: 2.5rem 0 1.5rem 0;">
+        <h1 style="color: {COLOR_ACCENT_TEAL}; font-size: 3rem; font-weight: 800; margin-bottom: 0.25rem; letter-spacing: -1px;">
             🎓 EduRisk
         </h1>
-        <p style="color: var(--text-secondary, #475569); font-size: 1.2rem; margin-top: 0;">
+        <p style="color: {COLOR_TEXT_SECONDARY}; font-size: 1.15rem; margin-top: 0;">
             Student Academic Risk Assessment & Decision Support Platform
         </p>
     </div>
@@ -144,10 +97,10 @@ if st.session_state.current_user is None:
     col_lspace, col_login, col_rspace = st.columns([1, 1.6, 1])
     with col_login:
         with st.container():
-            st.markdown("""
-            <div style="background-color: var(--bg-card, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; padding: 1.75rem; margin-bottom: 1.5rem;">
-                <h3 style="color: var(--text-primary, #0f172a); margin-top: 0;">🔐 Sign In to Your Academic Account</h3>
-                <p style="color: var(--text-muted, #64748b); font-size: 0.95rem;">
+            st.markdown(f"""
+            <div style="background-color: {COLOR_BG_CARD}; border: 1px solid {COLOR_BORDER}; border-radius: 12px; padding: 1.75rem; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+                <h3 style="color: {COLOR_TEXT_PRIMARY}; margin-top: 0; font-size: 1.3rem;">🔐 Sign In to Your Academic Account</h3>
+                <p style="color: {COLOR_TEXT_SECONDARY}; font-size: 0.95rem; line-height: 1.5; margin-bottom: 0;">
                     Access authorized student records, risk indicators, and intervention recommendations.
                 </p>
             </div>
@@ -163,21 +116,24 @@ if st.session_state.current_user is None:
                         st.error("Please enter both username/email and password.")
                     else:
                         db = SessionLocal()
-                        user = authenticate_user(db, username_input, password_input)
-                        db.close()
-                        if user:
-                            st.session_state.current_user = {
-                                "id": user.id,
-                                "username": user.username,
-                                "full_name": user.full_name,
-                                "role": user.role,
-                                "organization_id": user.organization_id,
-                                "organization_name": user.organization.name if user.organization else "Global System"
-                            }
-                            st.success(f"Welcome back, {user.full_name}!")
-                            st.rerun()
-                        else:
-                            st.error("Invalid credentials. Please verify your username and password.")
+                        try:
+                            user = authenticate_user(db, username_input, password_input)
+                            if user:
+                                org_name = user.organization.name if user.organization else "Global System"
+                                st.session_state.current_user = {
+                                    "id": user.id,
+                                    "username": user.username,
+                                    "full_name": user.full_name,
+                                    "role": user.role,
+                                    "organization_id": user.organization_id,
+                                    "organization_name": org_name
+                                }
+                                st.success(f"Welcome back, {user.full_name}!")
+                                st.rerun()
+                            else:
+                                st.error("Invalid credentials. Please verify your username and password.")
+                        finally:
+                            db.close()
 
             st.markdown("<br>", unsafe_allow_html=True)
 
@@ -188,48 +144,57 @@ if st.session_state.current_user is None:
                 with q1:
                     if st.button("🧑‍🏫 Teacher", use_container_width=True, help="Teacher at Horizon High School"):
                         db = SessionLocal()
-                        user = authenticate_user(db, "teacher1", "Teacher@123")
-                        db.close()
-                        if user:
-                            st.session_state.current_user = {
-                                "id": user.id,
-                                "username": user.username,
-                                "full_name": user.full_name,
-                                "role": user.role,
-                                "organization_id": user.organization_id,
-                                "organization_name": user.organization.name if user.organization else "Global System"
-                            }
-                            st.rerun()
+                        try:
+                            user = authenticate_user(db, "teacher1", "Teacher@123")
+                            if user:
+                                org_name = user.organization.name if user.organization else "Horizon High School"
+                                st.session_state.current_user = {
+                                    "id": user.id,
+                                    "username": user.username,
+                                    "full_name": user.full_name,
+                                    "role": user.role,
+                                    "organization_id": user.organization_id,
+                                    "organization_name": org_name
+                                }
+                                st.rerun()
+                        finally:
+                            db.close()
                 with q2:
                     if st.button("🏫 Org Admin", use_container_width=True, help="Administrator at Horizon High School"):
                         db = SessionLocal()
-                        user = authenticate_user(db, "orgadmin", "OrgAdmin@123")
-                        db.close()
-                        if user:
-                            st.session_state.current_user = {
-                                "id": user.id,
-                                "username": user.username,
-                                "full_name": user.full_name,
-                                "role": user.role,
-                                "organization_id": user.organization_id,
-                                "organization_name": user.organization.name if user.organization else "Global System"
-                            }
-                            st.rerun()
+                        try:
+                            user = authenticate_user(db, "orgadmin", "OrgAdmin@123")
+                            if user:
+                                org_name = user.organization.name if user.organization else "Horizon High School"
+                                st.session_state.current_user = {
+                                    "id": user.id,
+                                    "username": user.username,
+                                    "full_name": user.full_name,
+                                    "role": user.role,
+                                    "organization_id": user.organization_id,
+                                    "organization_name": org_name
+                                }
+                                st.rerun()
+                        finally:
+                            db.close()
                 with q3:
                     if st.button("🔬 Researcher", use_container_width=True, help="Lead AI Researcher (Full Research Access)"):
                         db = SessionLocal()
-                        user = authenticate_user(db, "researcher", "Research@123")
-                        db.close()
-                        if user:
-                            st.session_state.current_user = {
-                                "id": user.id,
-                                "username": user.username,
-                                "full_name": user.full_name,
-                                "role": user.role,
-                                "organization_id": user.organization_id,
-                                "organization_name": "Global Research System"
-                            }
-                            st.rerun()
+                        try:
+                            user = authenticate_user(db, "researcher", "Research@123")
+                            if user:
+                                org_name = user.organization.name if user.organization else "Global Research System"
+                                st.session_state.current_user = {
+                                    "id": user.id,
+                                    "username": user.username,
+                                    "full_name": user.full_name,
+                                    "role": user.role,
+                                    "organization_id": user.organization_id,
+                                    "organization_name": org_name
+                                }
+                                st.rerun()
+                        finally:
+                            db.close()
 
     st.stop()
 
@@ -245,7 +210,6 @@ class CurrentUserProxy:
         self.role = d.get("role", "TEACHER")
         self.organization_id = d.get("organization_id")
         self.organization_name = d.get("organization_name", "EduRisk Academic Institution")
-        # Dummy organization object for existing template lookups
         class Org:
             pass
         self.organization = Org()
@@ -255,17 +219,17 @@ current_user = CurrentUserProxy(st.session_state.current_user)
 
 
 # ============================================================================
-# 2. HORIZONTAL TOP NAVIGATION BAR
+# 2. HORIZONTAL TOP NAVIGATION BAR (MATTE BLACK / ELECTRIC TEAL)
 # ============================================================================
-st.markdown('<div class="edurisk-top-bar">', unsafe_allow_html=True)
+st.markdown('<div class="edurisk-navbar-container">', unsafe_allow_html=True)
 top_cols = st.columns([1.8, 5.0, 2.2])
 
 with top_cols[0]:
     st.markdown(f"""
     <div style="display: flex; align-items: center; gap: 8px; padding-top: 4px;">
-        <span style="font-size: 1.5rem; font-weight: 800; color: var(--brand-primary, #0284c7);">🎓 EduRisk</span>
-        <span style="font-size: 0.75rem; background-color: var(--bg-card, #f1f5f9); color: var(--text-muted, #64748b); padding: 2px 6px; border-radius: 6px; border: 1px solid var(--border-color, #cbd5e1);">
-            {current_user.organization_name[:14]}
+        <span style="font-size: 1.55rem; font-weight: 800; color: {COLOR_ACCENT_TEAL}; letter-spacing: -0.5px;">🎓 EduRisk</span>
+        <span style="font-size: 0.75rem; background-color: {COLOR_BG_SECONDARY}; color: {COLOR_TEXT_SECONDARY}; padding: 3px 8px; border-radius: 6px; border: 1px solid {COLOR_BORDER}; font-weight: 500;">
+            {current_user.organization_name[:16]}
         </span>
     </div>
     """, unsafe_allow_html=True)
@@ -300,8 +264,8 @@ with top_cols[2]:
         }.get(current_user.role, current_user.role)
         st.markdown(f"""
         <div style="text-align: right; line-height: 1.2; padding-top: 4px;">
-            <strong style="color: var(--text-primary, #0f172a); font-size: 0.85rem;">{current_user.full_name}</strong><br>
-            <span style="color: var(--brand-primary, #0284c7); font-size: 0.75rem; font-weight: 600;">{role_badge}</span>
+            <strong style="color: {COLOR_TEXT_PRIMARY}; font-size: 0.88rem;">{current_user.full_name}</strong><br>
+            <span style="color: {COLOR_ACCENT_TEAL}; font-size: 0.75rem; font-weight: 600;">{role_badge}</span>
         </div>
         """, unsafe_allow_html=True)
     with user_col2:
@@ -357,12 +321,12 @@ elif curr_page == "🛠️ Research & Admin Tools":
         st.stop()
 
     # Authorized System Admin / Researcher Sub-Navigation
-    st.markdown("""
+    st.markdown(f"""
     <div style="padding: 0.5rem 0 1rem 0;">
-        <h1 style="color: var(--text-primary, #0f172a); font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem;">
+        <h1 style="color: {COLOR_TEXT_PRIMARY}; font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem;">
             🛠️ Research, Benchmarking & System Administration
         </h1>
-        <p style="color: var(--text-secondary, #475569); font-size: 1.05rem;">
+        <p style="color: {COLOR_TEXT_SECONDARY}; font-size: 1.05rem;">
             Advanced algorithmic benchmarking, model re-training, SHAP validation, and research traceability.
         </p>
     </div>

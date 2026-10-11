@@ -6,6 +6,19 @@ understand key contributing factors, and receive practical pedagogical intervent
 import streamlit as st
 import pandas as pd
 from config.settings import CORE_FEATURES
+from config.theme import (
+    COLOR_BG_CARD,
+    COLOR_BG_SECONDARY,
+    COLOR_ACCENT_TEAL,
+    COLOR_ACCENT_VIOLET,
+    COLOR_TEXT_PRIMARY,
+    COLOR_TEXT_SECONDARY,
+    COLOR_BORDER,
+    COLOR_BORDER_SUBTLE,
+    COLOR_RISK_HIGH,
+    COLOR_RISK_MODERATE,
+    COLOR_RISK_LOW
+)
 
 # Reassuring presets for teachers wanting a quick walkthrough
 TEACHER_PROFILES = {
@@ -40,12 +53,12 @@ def render_predict_student(prediction_service, current_user=None):
     # Top Header & Navigation Bar Action
     col_hdr_title, col_hdr_back = st.columns([4, 1])
     with col_hdr_title:
-        st.markdown("""
-        <div style="padding: 0.5rem 0 0.5rem 0;">
-            <h1 style="color: var(--text-primary, #0f172a); font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem;">
+        st.markdown(f"""
+        <div style="padding: 0.25rem 0 0.5rem 0;">
+            <h1 style="color: {COLOR_TEXT_PRIMARY}; font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem;">
                 🎯 Student Academic Risk Assessment
             </h1>
-            <p style="color: var(--text-secondary, #475569); font-size: 1.05rem; margin: 0;">
+            <p style="color: {COLOR_TEXT_SECONDARY}; font-size: 1.05rem; margin: 0;">
                 Enter student indicators to assess support needs and review tailored pedagogical actions.
             </p>
         </div>
@@ -250,49 +263,51 @@ def render_predict_student(prediction_service, current_user=None):
         interventions = result.get("interventions", [])
         student_display_name = st.session_state.get("current_student_name", "This student")
 
-        st.markdown("---")
-        st.markdown(f"## 📊 Assessment Results for **{student_display_name}**")
+        st.markdown(f"<hr style='border: none; border-top: 1px solid {COLOR_BORDER}; margin: 1.5rem 0;'>", unsafe_allow_html=True)
+        st.markdown(f"<h2 style='color: {COLOR_TEXT_PRIMARY}; font-size: 1.6rem; font-weight: 700;'>📊 Assessment Results for <span style='color: {COLOR_ACCENT_TEAL};'>{student_display_name}</span></h2>", unsafe_allow_html=True)
 
         # 1. Plain-Language Risk Assessment Header Card
         risk_tier = pred.get("risk_tier", "LOW").upper()
         prob_val = pred.get("risk_probability", 0.0)
 
         if risk_tier == "HIGH":
-            banner_border = "#ef4444"
+            banner_border = COLOR_RISK_HIGH
             banner_title = "⚠️ Priority Support Recommended (High Academic Risk)"
-            badge_html = "<span style='background-color: #ef4444; color: #ffffff; padding: 4px 12px; border-radius: 12px; font-weight: 600; font-size: 0.9rem;'>Priority Support</span>"
+            badge_html = f"<span style='background-color: {COLOR_RISK_HIGH}; color: #0B0D12; padding: 4px 14px; border-radius: 12px; font-weight: 700; font-size: 0.85rem;'>Priority Support</span>"
             summary_desc = (
                 f"Based on current marks and attendance patterns, <strong>{student_display_name}</strong> is showing "
                 "strong indicators of academic vulnerability. Proactive, personalized assistance is advised to help them stay on track."
             )
         elif risk_tier == "MODERATE":
-            banner_border = "#f59e0b"
+            banner_border = COLOR_RISK_MODERATE
             banner_title = "⚡ Monitoring Advised (Moderate Risk)"
-            badge_html = "<span style='background-color: #f59e0b; color: #ffffff; padding: 4px 12px; border-radius: 12px; font-weight: 600; font-size: 0.9rem;'>Monitoring Advised</span>"
+            badge_html = f"<span style='background-color: {COLOR_RISK_MODERATE}; color: #0B0D12; padding: 4px 14px; border-radius: 12px; font-weight: 700; font-size: 0.85rem;'>Monitoring Advised</span>"
             summary_desc = (
                 f"<strong>{student_display_name}</strong> is currently in a borderline range. "
                 "Early check-ins and light academic mentoring can prevent emerging learning gaps from compounding."
             )
         else:
-            banner_border = "#10b981"
+            banner_border = COLOR_RISK_LOW
             banner_title = "✅ On Track (Lower Predicted Risk)"
-            badge_html = "<span style='background-color: #10b981; color: #ffffff; padding: 4px 12px; border-radius: 12px; font-weight: 600; font-size: 0.9rem;'>On Track</span>"
+            badge_html = f"<span style='background-color: {COLOR_RISK_LOW}; color: #0B0D12; padding: 4px 14px; border-radius: 12px; font-weight: 700; font-size: 0.85rem;'>On Track</span>"
             summary_desc = (
                 f"<strong>{student_display_name}</strong> demonstrates healthy engagement and performance indicators. "
                 "Continue standard instructional guidance and encourage their consistent study habits."
             )
 
         st.markdown(f"""
-        <div style="background-color: var(--bg-card, #f8fafc); 
-                    border: 2px solid {banner_border}; 
+        <div style="background-color: {COLOR_BG_CARD}; 
+                    border: 1px solid {COLOR_BORDER}; 
+                    border-left: 6px solid {banner_border}; 
                     border-radius: 12px; 
                     padding: 1.5rem; 
-                    margin-bottom: 1.5rem;">
+                    margin-bottom: 1.5rem;
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                <h3 style="margin: 0; color: var(--text-primary, #0f172a); font-size: 1.25rem;">{banner_title}</h3>
+                <h3 style="margin: 0; color: {COLOR_TEXT_PRIMARY}; font-size: 1.25rem; font-weight: 700;">{banner_title}</h3>
                 {badge_html}
             </div>
-            <p style="color: var(--text-secondary, #334155); font-size: 1.05rem; margin-bottom: 0; line-height: 1.5;">
+            <p style="color: {COLOR_TEXT_SECONDARY}; font-size: 1.05rem; margin-bottom: 0; line-height: 1.5;">
                 {summary_desc}
             </p>
         </div>
@@ -325,7 +340,7 @@ def render_predict_student(prediction_service, current_user=None):
         st.markdown("<br>", unsafe_allow_html=True)
 
         # 3. Main Contributing Factors
-        st.markdown("### 🔍 Main Contributing Factors")
+        st.markdown(f"<h3 style='color: {COLOR_TEXT_PRIMARY}; font-size: 1.3rem;'>🔍 Main Contributing Factors</h3>", unsafe_allow_html=True)
         st.caption("Here are the main student indicators influencing this assessment:")
 
         risk_increasing = shap_res.get("risk_increasing_factors", [])
@@ -334,41 +349,41 @@ def render_predict_student(prediction_service, current_user=None):
         col_factors1, col_factors2 = st.columns(2)
 
         with col_factors1:
-            st.markdown("#### 🔻 Factors Increasing Academic Concern")
+            st.markdown(f"<h4 style='color: {COLOR_RISK_HIGH}; font-size: 1.05rem;'>🔻 Factors Increasing Academic Concern</h4>", unsafe_allow_html=True)
             if risk_increasing:
                 for item in risk_increasing[:3]:
                     feat_name = item["feature"].replace("_", " ").title()
                     raw_v = item.get("raw_value")
                     val_display = f"({raw_v})" if raw_v is not None else ""
                     st.markdown(f"""
-                    <div style="background-color: var(--bg-card, #fff1f2); border-left: 4px solid #ef4444; border: 1px solid var(--border-color, #fecdd3); padding: 10px 14px; border-radius: 6px; margin-bottom: 8px;">
-                        <strong style="color: #ef4444;">{feat_name} {val_display}</strong><br>
-                        <span style="color: var(--text-secondary, #4c0519); font-size: 0.9rem;">Elevated predicted academic risk.</span>
+                    <div style="background-color: {COLOR_BG_SECONDARY}; border-left: 4px solid {COLOR_RISK_HIGH}; border: 1px solid {COLOR_BORDER}; padding: 12px 14px; border-radius: 8px; margin-bottom: 10px;">
+                        <strong style="color: {COLOR_RISK_HIGH};">{feat_name} {val_display}</strong><br>
+                        <span style="color: {COLOR_TEXT_SECONDARY}; font-size: 0.9rem;">Elevated predicted academic risk.</span>
                     </div>
                     """, unsafe_allow_html=True)
             else:
-                st.markdown("""
-                <div style="background-color: var(--bg-card, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); padding: 10px 14px; border-radius: 6px; color: var(--text-muted, #64748b); font-size: 0.95rem;">
+                st.markdown(f"""
+                <div style="background-color: {COLOR_BG_SECONDARY}; border: 1px solid {COLOR_BORDER}; padding: 12px 14px; border-radius: 8px; color: {COLOR_TEXT_SECONDARY}; font-size: 0.95rem;">
                     No critical risk-increasing factors detected.
                 </div>
                 """, unsafe_allow_html=True)
 
         with col_factors2:
-            st.markdown("#### 🛡️ Protective Factors Supporting Stability")
+            st.markdown(f"<h4 style='color: {COLOR_RISK_LOW}; font-size: 1.05rem;'>🛡️ Protective Factors Supporting Stability</h4>", unsafe_allow_html=True)
             if protective_factors:
                 for item in protective_factors[:3]:
                     feat_name = item["feature"].replace("_", " ").title()
                     raw_v = item.get("raw_value")
                     val_display = f"({raw_v})" if raw_v is not None else ""
                     st.markdown(f"""
-                    <div style="background-color: var(--bg-card, #f0fdf4); border-left: 4px solid #10b981; border: 1px solid var(--border-color, #bbf7d0); padding: 10px 14px; border-radius: 6px; margin-bottom: 8px;">
-                        <strong style="color: #10b981;">{feat_name} {val_display}</strong><br>
-                        <span style="color: var(--text-secondary, #14532d); font-size: 0.9rem;">Acted as a positive buffer against academic difficulty.</span>
+                    <div style="background-color: {COLOR_BG_SECONDARY}; border-left: 4px solid {COLOR_RISK_LOW}; border: 1px solid {COLOR_BORDER}; padding: 12px 14px; border-radius: 8px; margin-bottom: 10px;">
+                        <strong style="color: {COLOR_RISK_LOW};">{feat_name} {val_display}</strong><br>
+                        <span style="color: {COLOR_TEXT_SECONDARY}; font-size: 0.9rem;">Acted as a positive buffer against academic difficulty.</span>
                     </div>
                     """, unsafe_allow_html=True)
             else:
-                st.markdown("""
-                <div style="background-color: var(--bg-card, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); padding: 10px 14px; border-radius: 6px; color: var(--text-muted, #64748b); font-size: 0.95rem;">
+                st.markdown(f"""
+                <div style="background-color: {COLOR_BG_SECONDARY}; border: 1px solid {COLOR_BORDER}; padding: 12px 14px; border-radius: 8px; color: {COLOR_TEXT_SECONDARY}; font-size: 0.95rem;">
                     No notable protective buffers identified.
                 </div>
                 """, unsafe_allow_html=True)
@@ -376,9 +391,11 @@ def render_predict_student(prediction_service, current_user=None):
         # Plain language summary sentences if available
         if shap_res.get("plain_language_summary"):
             st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown("**Plain Language Summary:**")
+            st.markdown(f"<div style='background-color: {COLOR_BG_CARD}; border: 1px solid {COLOR_BORDER}; border-left: 4px solid {COLOR_ACCENT_VIOLET}; border-radius: 8px; padding: 1rem 1.25rem;'>", unsafe_allow_html=True)
+            st.markdown(f"<strong style='color: {COLOR_ACCENT_VIOLET};'>💡 AI Synthesis Summary:</strong>", unsafe_allow_html=True)
             for sentence in shap_res["plain_language_summary"][:3]:
-                st.write(f"• {sentence}")
+                st.markdown(f"<span style='color: {COLOR_TEXT_SECONDARY}; font-size: 0.95rem;'>• {sentence}</span>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
         # Secondary Technical Explanation Expander (kept for researchers / audit)
         with st.expander("🔬 View Technical Explanation (For Data Specialists & Researchers)"):
@@ -396,27 +413,27 @@ def render_predict_student(prediction_service, current_user=None):
         st.markdown("<br>", unsafe_allow_html=True)
 
         # 4. Recommended Support (Pedagogical Interventions)
-        st.markdown("### 🤝 Recommended Pedagogical Support Actions")
+        st.markdown(f"<h3 style='color: {COLOR_TEXT_PRIMARY}; font-size: 1.3rem;'>🤝 Recommended Pedagogical Support Actions</h3>", unsafe_allow_html=True)
         st.caption("Targeted, non-judgmental support strategies based on the identified risk drivers:")
 
         if interventions:
             for idx, item in enumerate(interventions):
                 prio = item.get("priority", "MEDIUM")
-                prio_color = {"HIGH": "#ef4444", "MEDIUM": "#f59e0b", "LOW": "#10b981"}.get(prio, "#64748b")
+                prio_color = {"HIGH": COLOR_RISK_HIGH, "MEDIUM": COLOR_RISK_MODERATE, "LOW": COLOR_RISK_LOW}.get(prio, COLOR_ACCENT_TEAL)
                 
                 st.markdown(f"""
-                <div style="background-color: var(--bg-card, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-left: 5px solid {prio_color}; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem;">
+                <div style="background-color: {COLOR_BG_CARD}; border: 1px solid {COLOR_BORDER}; border-left: 5px solid {prio_color}; border-radius: 10px; padding: 1.15rem; margin-bottom: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <h4 style="margin: 0; color: var(--text-primary, #0f172a);">📌 {item.get('action', 'Academic Support Action')}</h4>
-                        <span style="background-color: {prio_color}; color: #ffffff; padding: 2px 8px; border-radius: 8px; font-size: 0.8rem; font-weight: 600;">
+                        <h4 style="margin: 0; color: {COLOR_TEXT_PRIMARY}; font-size: 1.1rem; font-weight: 600;">📌 {item.get('action', 'Academic Support Action')}</h4>
+                        <span style="background-color: {prio_color}; color: #0B0D12; padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700;">
                             {prio} Priority
                         </span>
                     </div>
-                    <p style="color: var(--text-secondary, #475569); margin: 0.5rem 0 0.25rem 0; font-size: 0.95rem;">
-                        <strong>Why this helps:</strong> {item.get('rationale', 'Assists student engagement and concept mastery.')}
+                    <p style="color: {COLOR_TEXT_SECONDARY}; margin: 0.5rem 0 0.4rem 0; font-size: 0.95rem; line-height: 1.5;">
+                        <strong style="color: {COLOR_TEXT_PRIMARY};">Why this helps:</strong> {item.get('rationale', 'Assists student engagement and concept mastery.')}
                     </p>
-                    <p style="color: var(--text-muted, #94a3b8); font-size: 0.85rem; margin: 0;">
-                        Targeted Indicator: <code>{item.get('feature', 'Engagement')}</code>
+                    <p style="color: {COLOR_TEXT_SECONDARY}; font-size: 0.85rem; margin: 0;">
+                        Targeted Indicator: <code style="background-color: {COLOR_BG_SECONDARY}; color: {COLOR_ACCENT_TEAL}; padding: 2px 6px; border-radius: 4px; border: 1px solid {COLOR_BORDER};">{item.get('feature', 'Engagement')}</code>
                     </p>
                 </div>
                 """, unsafe_allow_html=True)
@@ -439,7 +456,7 @@ def render_predict_student(prediction_service, current_user=None):
                 st.session_state.current_page = "🏠 Home"
                 st.rerun()
 
-    st.markdown("<br><hr style='border: none; border-top: 1px solid var(--border-color, #e2e8f0);'>", unsafe_allow_html=True)
+    st.markdown(f"<br><hr style='border: none; border-top: 1px solid {COLOR_BORDER};'>", unsafe_allow_html=True)
     st.caption(
         "🔒 **Privacy & Ethical Safeguard**: All assessments are calculated locally in your session. "
         "Predictions provide formative decision support for educators and must be paired with compassionate human discussion."

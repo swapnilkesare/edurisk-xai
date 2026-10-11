@@ -50,6 +50,8 @@ def render_model_comparison(training_service, prediction_service):
 
     st.markdown("---")
 
+    from config.theme import apply_dark_theme_to_plotly, COLOR_ACCENT_TEAL, COLOR_ACCENT_VIOLET, COLOR_RISK_HIGH, COLOR_RISK_MODERATE, COLOR_RISK_LOW
+
     # Interactive Visualizations
     col_v1, col_v2 = st.columns(2)
 
@@ -58,15 +60,15 @@ def render_model_comparison(training_service, prediction_service):
         fig_bars = go.Figure()
         fig_bars.add_trace(go.Bar(
             x=df_comp["Model"], y=df_comp["CV Macro F1"],
-            name="CV Macro F1", marker_color="#3b82f6"
+            name="CV Macro F1", marker_color=COLOR_ACCENT_VIOLET
         ))
         fig_bars.add_trace(go.Bar(
             x=df_comp["Model"], y=df_comp["Test Macro F1"],
-            name="Test Macro F1", marker_color="#10b981"
+            name="Test Macro F1", marker_color=COLOR_ACCENT_TEAL
         ))
         fig_bars.add_trace(go.Bar(
             x=df_comp["Model"], y=df_comp["High-Risk Recall"],
-            name="High-Risk Recall", marker_color="#f59e0b"
+            name="High-Risk Recall", marker_color=COLOR_RISK_MODERATE
         ))
         fig_bars.update_layout(
             barmode="group",
@@ -74,6 +76,7 @@ def render_model_comparison(training_service, prediction_service):
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
             margin=dict(l=20, r=20, t=30, b=20)
         )
+        fig_bars = apply_dark_theme_to_plotly(fig_bars)
         st.plotly_chart(fig_bars, use_container_width=True)
 
     with col_v2:
@@ -81,12 +84,13 @@ def render_model_comparison(training_service, prediction_service):
         fig_cost = go.Figure()
         fig_cost.add_trace(go.Bar(
             x=df_comp["Model"], y=df_comp["Inference Latency (ms)"],
-            name="Inference (ms)", marker_color="#8b5cf6"
+            name="Inference (ms)", marker_color=COLOR_ACCENT_VIOLET
         ))
         fig_cost.update_layout(
             yaxis=dict(title="Latency (ms / sample)"),
             margin=dict(l=20, r=20, t=30, b=20)
         )
+        fig_cost = apply_dark_theme_to_plotly(fig_cost)
         st.plotly_chart(fig_cost, use_container_width=True)
 
     st.markdown("---")

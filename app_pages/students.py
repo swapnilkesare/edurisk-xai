@@ -6,17 +6,25 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
+from config.theme import (
+    COLOR_BG_CARD,
+    COLOR_BG_SECONDARY,
+    COLOR_ACCENT_TEAL,
+    COLOR_TEXT_PRIMARY,
+    COLOR_TEXT_SECONDARY,
+    COLOR_BORDER
+)
 from database.database import SessionLocal
 from database.models import Student, Prediction
 from services.auth_service import get_scoped_students, log_audit_event
 
 def render_students(current_user=None):
-    st.markdown("""
-    <div style="padding: 0.5rem 0 1rem 0;">
-        <h1 style="color: var(--text-primary, #0f172a); font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem;">
+    st.markdown(f"""
+    <div style="padding: 0.25rem 0 0.75rem 0;">
+        <h1 style="color: {COLOR_TEXT_PRIMARY}; font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem;">
             👥 Enrolled Student Roster
         </h1>
-        <p style="color: var(--text-secondary, #475569); font-size: 1.05rem;">
+        <p style="color: {COLOR_TEXT_SECONDARY}; font-size: 1.05rem;">
             View and manage students enrolled in your academic cohort.
         </p>
     </div>
@@ -113,17 +121,24 @@ def render_students(current_user=None):
         st.dataframe(filtered_df, use_container_width=True, hide_index=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
-        col_act1, col_act2 = st.columns([2, 1])
+        st.markdown(f"""
+        <div style="background-color: {COLOR_BG_CARD}; border: 1px solid {COLOR_BORDER}; border-left: 5px solid {COLOR_ACCENT_TEAL}; border-radius: 12px; padding: 1.25rem 1.5rem; margin-top: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+            <h3 style="color: {COLOR_TEXT_PRIMARY}; margin: 0 0 0.25rem 0; font-size: 1.2rem;">⚡ Quick Assessment Launcher</h3>
+            <p style="color: {COLOR_TEXT_SECONDARY}; margin: 0 0 0.75rem 0; font-size: 0.95rem;">Select an enrolled student to automatically load their profile into the Risk Assessment engine.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        col_act1, col_act2 = st.columns([2.5, 1.2])
         with col_act1:
-            st.markdown("### ⚡ Quick Assessment Launcher")
             selected_stu_id = st.selectbox(
                 "Choose a student from roster to evaluate:",
                 [s.student_identifier for s in students],
-                format_func=lambda x: f"{x} — {next((s.name for s in students if s.student_identifier == x), '')}"
+                format_func=lambda x: f"{x} — {next((s.name for s in students if s.student_identifier == x), '')}",
+                key="roster_student_quick_select"
             )
         with col_act2:
-            st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("🚀 Launch Assessment for Selected Student", type="primary", use_container_width=True):
+            st.markdown("<div style='padding-top: 1.7rem;'>", unsafe_allow_html=True)
+            if st.button("🚀 Launch Assessment", type="primary", use_container_width=True, key="launch_roster_assessment_btn"):
                 target_stu = next((s for s in students if s.student_identifier == selected_stu_id), None)
                 if target_stu:
                     st.session_state.selected_student_for_assessment = {
@@ -132,6 +147,7 @@ def render_students(current_user=None):
                     }
                 st.session_state.current_page = "🎯 Student Risk Assessment"
                 st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
 
     finally:
         db.close()
