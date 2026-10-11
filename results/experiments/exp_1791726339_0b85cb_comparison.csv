@@ -1,0 +1,5 @@
+Model,CV Macro F1,Test Macro F1,Test Accuracy,High-Risk Recall,ROC-AUC,False Negatives,Train Time (s),Inference (ms),Size (KB)
+Decision Tree,0.7864,0.8884,0.9583,0.6667,0.8333,1,1.5684,4.9846,10.84
+Support Vector Classifier,0.6291,0.7491,0.875,0.6667,0.8889,1,0.8677,4.7986,19.03
+Logistic Regression,0.6453,0.7491,0.875,0.6667,0.9206,1,0.4874,4.9317,9.79
+Random Forest,0.5357,0.7273,0.9167,0.3333,1.0,2,3.8242,8.8387,194.55
