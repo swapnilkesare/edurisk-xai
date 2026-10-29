@@ -1,0 +1,50 @@
+{
+    "selected_model": "Decision Tree",
+    "selection_reason": "Highest composite score (Test Macro F1: 0.808, Test High-Risk Recall: 0.900)",
+    "metrics": [
+        {
+            "Model": "Decision Tree",
+            "CV Macro F1": 0.8605502305759352,
+            "Test Accuracy": 0.8769230769230769,
+            "Test Precision": 0.5625,
+            "Test Recall": 0.9,
+            "Test F1": 0.6923076923076923,
+            "Test Macro F1": 0.8076923076923077,
+            "Training Time (s)": 6.862285614013672,
+            "Inference Time (ms)": 0.0409089601956881
+        },
+        {
+            "Model": "SVC",
+            "CV Macro F1": 0.877399196767017,
+            "Test Accuracy": 0.8692307692307693,
+            "Test Precision": 0.5483870967741935,
+            "Test Recall": 0.85,
+            "Test F1": 0.6666666666666666,
+            "Test Macro F1": 0.7926634768740032,
+            "Training Time (s)": 0.4069054126739502,
+            "Inference Time (ms)": 0.052650158221905045
+        },
+        {
+            "Model": "Logistic Regression",
+            "CV Macro F1": 0.8629660922931564,
+            "Test Accuracy": 0.8615384615384616,
+            "Test Precision": 0.5294117647058824,
+            "Test Recall": 0.9,
+            "Test F1": 0.6666666666666666,
+            "Test Macro F1": 0.7896440129449838,
+            "Training Time (s)": 0.18518781661987305,
+            "Inference Time (ms)": 0.033349257249098554
+        },
+        {
+            "Model": "Random Forest",
+            "CV Macro F1": 0.891721464472498,
+            "Test Accuracy": 0.8923076923076924,
+            "Test Precision": 0.6071428571428571,
+            "Test Recall": 0.85,
+            "Test F1": 0.7083333333333334,
+            "Test Macro F1": 0.8211477987421384,
+            "Training Time (s)": 1.1859245300292969,
+            "Inference Time (ms)": 0.13280281653771034
+        }
+    ]
+}

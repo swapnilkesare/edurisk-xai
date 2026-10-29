@@ -1,0 +1,13 @@
+streamlit
+pandas
+numpy
+scikit-learn
+imbalanced-learn
+shap
+plotly
+matplotlib
+seaborn
+SQLAlchemy
+ucimlrepo
+python-dotenv
+pytest

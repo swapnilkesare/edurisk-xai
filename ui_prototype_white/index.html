@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="EduRisk XAI — Modern White Theme UI Prototype for Transparent Student Academic Risk Assessment and Pedagogical Intervention">
+  <title>EduRisk XAI — Student Academic Risk Assessment & Decision Support</title>
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Core White Theme Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Accessible Skip to Content Link -->
+  <a href="#mainContent" class="skip-link">Skip to main content</a>
+
+  <!-- Top Prototype Disclosure Banner -->
+  <aside class="prototype-notice-banner" role="region" aria-label="Prototype Disclosure">
+    <span class="notice-pill">PROTOTYPE DEMONSTRATION</span>
+    <span>Interactive White UI Prototype with Anime.js animations. All metrics, student records, and model outputs are fictional demo samples.</span>
+  </aside>
+
+  <!-- Top Navigation Header -->
+  <header class="site-header" role="banner">
+    <div class="app-container">
+      <div class="nav-wrapper">
+        
+        <!-- Brand Wordmark & Institution -->
+        <a href="#home" class="brand-section" aria-label="EduRisk Home">
+          <span class="brand-logo" aria-hidden="true">🎓</span>
+          <span class="brand-title">EduRisk</span>
+          <span class="brand-badge">Horizon High School</span>
+        </a>
+
+        <!-- Navigation Menu (Shown after login) -->
+        <nav role="navigation" aria-label="Main Navigation" id="mainNavBar" style="display: none;">
+          <ul class="nav-menu" id="navMenu">
+            <li class="nav-item">
+              <button class="nav-button active" data-target-view="home" aria-selected="true" role="tab">
+                <span>🏠</span> Home
+              </button>
+              <div class="nav-indicator-pill"></div>
+            </li>
+            <li class="nav-item">
+              <button class="nav-button" data-target-view="assessment" aria-selected="false" role="tab">
+                <span>🎯</span> Risk Assessment
+              </button>
+              <div class="nav-indicator-pill"></div>
+            </li>
+            <li class="nav-item">
+              <button class="nav-button" data-target-view="students" aria-selected="false" role="tab">
+                <span>👥</span> Students
+              </button>
+              <div class="nav-indicator-pill"></div>
+            </li>
+            <li class="nav-item">
+              <button class="nav-button" data-target-view="reports" aria-selected="false" role="tab">
+                <span>📊</span> Reports
+              </button>
+              <div class="nav-indicator-pill"></div>
+            </li>
+            <li class="nav-item" id="navItemAdmin" style="display: none;">
+              <button class="nav-button" data-target-view="admin" aria-selected="false" role="tab">
+                <span>🛠️</span> Research & Admin
+              </button>
+              <div class="nav-indicator-pill"></div>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- Authenticated User Controls (Shown after login) -->
+        <div class="nav-controls" id="authenticatedNavControls" style="display: none;">
+          <span class="role-badge" id="currentRoleBadge">Educator</span>
+
+          <button class="user-profile-btn" id="userProfileBtn" aria-label="User Profile">
+            <span class="avatar-circle" id="userAvatar">EV</span>
+            <span style="font-weight: 600; font-size: 0.84rem;" id="userProfileName">Dr. Vance</span>
+          </button>
+
+          <button class="btn-logout" id="btnLogout" aria-label="Sign out of EduRisk">
+            <span>🚪</span> Sign Out
+          </button>
+
+          <!-- Mobile Menu Hamburger -->
+          <button class="mobile-toggle-btn" id="mobileMenuToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+            ☰
+          </button>
+        </div>
+
+        <!-- Unauthenticated Indicator -->
+        <div class="nav-controls" id="unauthNavIndicator">
+          <span class="role-badge" style="background-color: var(--teal-surface); color: var(--teal-primary); border: 1px solid var(--teal-border);">
+            🔐 Portal Authentication
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area (SPA Router Views) -->
+  <main class="content-area" id="mainContent" role="main">
+    <div class="app-container">
+
+      <!-- ====================================================================
+           VIEW 0: 🔐 RESTORED LOGIN GATEWAY
+           ==================================================================== -->
+      <section id="view-login" class="view-section active-view" aria-labelledby="loginHeading">
+        <div class="login-wrapper">
+          <div class="card login-card">
+            <div class="login-header">
+              <div class="login-brand-logo" aria-hidden="true">🎓</div>
+              <h1 id="loginHeading" class="login-title">EduRisk XAI Portal</h1>
+              <p class="login-subtitle">
+                Transparent Student Academic Risk Assessment & Decision Support System
+              </p>
+              <div class="login-inst-badge">Horizon High School • Evidence-Based Learning Analytics</div>
+            </div>
+
+            <form id="loginForm" novalidate onsubmit="return false;">
+              <div class="login-error-alert" id="loginErrorAlert" role="alert" style="display: none;">
+                <span>⚠️</span>
+                <span id="loginErrorText">Invalid username or password.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="loginUsername" class="form-label">Username</label>
+                <div class="input-with-icon">
+                  <span class="input-icon">👤</span>
+                  <input type="text" id="loginUsername" class="form-control" placeholder="e.g. teacher1" required autocomplete="username">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="loginPassword" class="form-label">Password</label>
+                <div class="input-with-icon">
+                  <span class="input-icon">🔒</span>
+                  <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary" id="btnLoginSubmit" style="width: 100%; margin-top: 0.5rem; padding: 0.75rem; justify-content: center; font-size: 0.95rem;">
+                <span>🔐</span> Sign In to EduRisk
+              </button>
+            </form>
+
+            <div class="login-demo-section">
+              <div class="demo-section-label">Demo Quick Access (Pre-Configured Accounts):</div>
+              <div class="demo-accounts-grid">
+                <button type="button" class="btn-demo-pill" data-user="teacher1" data-pass="teacher123">
+                  <div class="pill-role">Educator (Horizon High)</div>
+                  <div class="pill-cred">teacher1 • teacher123</div>
+                </button>
+                <button type="button" class="btn-demo-pill" data-user="teacher2" data-pass="teacher123">
+                  <div class="pill-role">Educator (Metro District)</div>
+                  <div class="pill-cred">teacher2 • teacher123</div>
+                </button>
+                <button type="button" class="btn-demo-pill" data-user="orgadmin" data-pass="admin123">
+                  <div class="pill-role">Institutional Admin</div>
+                  <div class="pill-cred">orgadmin • admin123</div>
+                </button>
+                <button type="button" class="btn-demo-pill" data-user="researcher" data-pass="researcher123">
+                  <div class="pill-role">Lead AI Researcher</div>
+                  <div class="pill-cred">researcher • researcher123</div>
+                </button>
+              </div>
+            </div>
+
+            <div class="login-footer-note">
+              <span>🛡️ RBAC Protected: Role boundaries and institutional scoping strictly enforced.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           VIEW 1: 🏠 HOME (TEACHER DASHBOARD)
+           ==================================================================== -->
+      <section id="view-home" class="view-section" aria-labelledby="homeHeading" style="display: none;">
+
+        
+        <!-- Welcome Hero Banner -->
+        <div class="welcome-card">
+          <div class="welcome-info">
+            <h1 id="userGreetingHeading" style="font-size: 1.6rem; margin-bottom: 0.25rem;">Welcome back, Dr. Elena Vance</h1>
+            <div class="welcome-meta">Horizon High School • Term 2 Academic Monitoring</div>
+            <p class="welcome-desc">
+              EduRisk provides transparent, evidence-grounded risk indicators to support proactive student success, early pedagogical intervention, and structured advisor check-ins.
+            </p>
+          </div>
+          <div class="welcome-actions">
+            <button class="btn btn-primary" id="btnQuickAssess">
+              <span>🎯</span> Assess Student Risk
+            </button>
+            <button class="btn btn-secondary" id="btnReviewAttention">
+              <span>⚠️</span> Review Priority Cohort
+            </button>
+          </div>
+        </div>
+
+        <!-- Summary Metric Cards (DEMO DATA) -->
+        <div class="metrics-grid">
+          
+          <div class="metric-card total">
+            <div class="metric-top">
+              <span class="metric-label">Total Monitored</span>
+              <div class="metric-icon-box" aria-hidden="true">👥</div>
+            </div>
+            <div class="metric-value-wrap">
+              <span class="metric-number" id="metricTotalStudents">142</span>
+              <span class="metric-badge green">↑ 4% this term</span>
+            </div>
+            <span class="metric-subtext">Active enrolled students across Grade 10–12</span>
+          </div>
+
+          <div class="metric-card attention">
+            <div class="metric-top">
+              <span class="metric-label">Immediate Attention</span>
+              <div class="metric-icon-box" aria-hidden="true">⚠️</div>
+            </div>
+            <div class="metric-value-wrap">
+              <span class="metric-number" id="metricAttentionStudents">18</span>
+              <span class="metric-badge red">12.7% of cohort</span>
+            </div>
+            <span class="metric-subtext">Breaching attendance or formative test thresholds</span>
+          </div>
+
+          <div class="metric-card completed">
+            <div class="metric-top">
+              <span class="metric-label">Assessments Completed</span>
+              <div class="metric-icon-box" aria-hidden="true">✅</div>
+            </div>
+            <div class="metric-value-wrap">
+              <span class="metric-number" id="metricCompletedAssessments">88</span>
+              <span class="metric-badge green">62% coverage</span>
+            </div>
+            <span class="metric-subtext">Evaluated in current academic cycle</span>
+          </div>
+
+          <div class="metric-card pending">
+            <div class="metric-top">
+              <span class="metric-label">Pending Follow-ups</span>
+              <div class="metric-icon-box" aria-hidden="true">📋</div>
+            </div>
+            <div class="metric-value-wrap">
+              <span class="metric-number" id="metricPendingActions">7</span>
+              <span class="metric-badge amber">Due this week</span>
+            </div>
+            <span class="metric-subtext">Assigned mentoring & counseling actions</span>
+          </div>
+
+        </div>
+
+        <!-- Visualizations Grid -->
+        <div class="charts-grid">
+          
+          <!-- Risk Distribution Donut Chart -->
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <span>📊</span> Cohort Risk Tier Breakdown
+              </h3>
+              <span class="demo-data-tag">DEMO DATA</span>
+            </div>
+            <div class="chart-container">
+              <div class="donut-chart-wrap">
+                
+                <div class="donut-svg-box">
+                  <svg viewBox="0 0 36 36" style="width: 100%; height: 100%; transform: rotate(-90deg);" role="img" aria-label="Risk breakdown donut chart">
+                    <!-- Low Risk Segment: 68% (dasharray 68 32) -->
+                    <circle cx="18" cy="18" r="14" fill="none" stroke="#DCFCE7" stroke-width="4.5"></circle>
+                    <circle cx="18" cy="18" r="14" fill="none" stroke="#15803D" stroke-width="4.5" stroke-dasharray="68 32" stroke-dashoffset="0"></circle>
+                    <!-- Moderate Risk Segment: 20% (dasharray 20 80, offset -68) -->
+                    <circle cx="18" cy="18" r="14" fill="none" stroke="#D97706" stroke-width="4.5" stroke-dasharray="20 80" stroke-dashoffset="-68"></circle>
+                    <!-- High Risk Segment: 12% (dasharray 12 88, offset -88) -->
+                    <circle cx="18" cy="18" r="14" fill="none" stroke="#DC2626" stroke-width="4.5" stroke-dasharray="12 88" stroke-dashoffset="-88"></circle>
+                  </svg>
+                  <div class="donut-center-text">
+                    <div class="donut-total">142</div>
+                    <div class="donut-sublabel">Students</div>
+                  </div>
+                </div>
+
+                <div class="donut-legend">
+                  <div class="legend-row">
+                    <span class="legend-key">
+                      <span class="legend-dot" style="background-color: var(--risk-low);"></span>
+                      <span>Low Risk (On Track)</span>
+                    </span>
+                    <span class="legend-count">96 (67.6%)</span>
+                  </div>
+                  <div class="legend-row">
+                    <span class="legend-key">
+                      <span class="legend-dot" style="background-color: var(--warning);"></span>
+                      <span>Moderate Risk</span>
+                    </span>
+                    <span class="legend-count">28 (19.7%)</span>
+                  </div>
+                  <div class="legend-row">
+                    <span class="legend-key">
+                      <span class="legend-dot" style="background-color: var(--risk-high);"></span>
+                      <span>High Risk (Priority)</span>
+                    </span>
+                    <span class="legend-count">18 (12.7%)</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Monthly Longitudinal Progress Trend -->
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <span>📈</span> Monthly Longitudinal Risk Trajectory
+              </h3>
+              <span class="demo-data-tag">DEMO DATA</span>
+            </div>
+            <div class="chart-container">
+              <div class="trend-chart-wrap">
+                <div class="trend-bars-container">
+                  
+                  <div class="trend-col">
+                    <div class="trend-bar-stack" title="Oct: 22 High, 31 Mod, 89 Low">
+                      <div class="bar-segment" style="height: 60%; background-color: var(--risk-low);"></div>
+                      <div class="bar-segment" style="height: 25%; background-color: var(--warning);"></div>
+                      <div class="bar-segment" style="height: 15%; background-color: var(--risk-high);"></div>
+                    </div>
+                    <span class="trend-label">Oct</span>
+                  </div>
+
+                  <div class="trend-col">
+                    <div class="trend-bar-stack" title="Nov: 20 High, 29 Mod, 93 Low">
+                      <div class="bar-segment" style="height: 63%; background-color: var(--risk-low);"></div>
+                      <div class="bar-segment" style="height: 23%; background-color: var(--warning);"></div>
+                      <div class="bar-segment" style="height: 14%; background-color: var(--risk-high);"></div>
+                    </div>
+                    <span class="trend-label">Nov</span>
+                  </div>
+
+                  <div class="trend-col">
+                    <div class="trend-bar-stack" title="Dec: 19 High, 27 Mod, 96 Low">
+                      <div class="bar-segment" style="height: 66%; background-color: var(--risk-low);"></div>
+                      <div class="bar-segment" style="height: 21%; background-color: var(--warning);"></div>
+                      <div class="bar-segment" style="height: 13%; background-color: var(--risk-high);"></div>
+                    </div>
+                    <span class="trend-label">Dec</span>
+                  </div>
+
+                  <div class="trend-col">
+                    <div class="trend-bar-stack" title="Jan: 21 High, 30 Mod, 91 Low">
+                      <div class="bar-segment" style="height: 62%; background-color: var(--risk-low);"></div>
+                      <div class="bar-segment" style="height: 24%; background-color: var(--warning);"></div>
+                      <div class="bar-segment" style="height: 14%; background-color: var(--risk-high);"></div>
+                    </div>
+                    <span class="trend-label">Jan</span>
+                  </div>
+
+                  <div class="trend-col">
+                    <div class="trend-bar-stack" title="Feb (Current): 18 High, 28 Mod, 96 Low">
+                      <div class="bar-segment" style="height: 68%; background-color: var(--risk-low);"></div>
+                      <div class="bar-segment" style="height: 20%; background-color: var(--warning);"></div>
+                      <div class="bar-segment" style="height: 12%; background-color: var(--risk-high);"></div>
+                    </div>
+                    <span class="trend-label" style="color: var(--teal-primary); font-weight: 700;">Feb</span>
+                  </div>
+
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); text-align: center; margin-top: 0.5rem;">
+                  Green = Low Risk | Amber = Moderate Risk | Red = High Risk
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Recent Assessment Activity & Student Priority Table -->
+        <div class="card" style="padding: 1.5rem;">
+          <div class="card-header" style="border-bottom: none; margin-bottom: 0.5rem; padding-bottom: 0;">
+            <h3 class="card-title">
+              <span>📋</span> Recent Activity & Student Attention Queue
+            </h3>
+            <span class="demo-data-tag">DEMO DATA</span>
+          </div>
+
+          <!-- Table Toolbar (Search & Filter Pills) -->
+          <div class="table-toolbar">
+            <div class="search-box">
+              <span class="search-icon" aria-hidden="true">🔍</span>
+              <input type="text" id="dashSearchInput" class="search-input" placeholder="Search by student name, ID, or class..." aria-label="Search student table">
+            </div>
+
+            <div class="filter-pills-group" role="group" aria-label="Filter students by risk level">
+              <button class="filter-pill active" data-filter="all">All (142)</button>
+              <button class="filter-pill" data-filter="high">High Risk (18)</button>
+              <button class="filter-pill" data-filter="moderate">Moderate (28)</button>
+              <button class="filter-pill" data-filter="low">Low Risk (96)</button>
+            </div>
+          </div>
+
+          <!-- Responsive Data Table -->
+          <div class="table-responsive">
+            <table class="data-table" aria-label="Recent student risk assessments">
+              <thead>
+                <tr>
+                  <th class="sortable" data-sort-col="id">Student ID</th>
+                  <th class="sortable" data-sort-col="name">Name & Class</th>
+                  <th class="sortable" data-sort-col="assessmentDate">Assessed Date</th>
+                  <th class="sortable" data-sort-col="riskTier">Risk Category</th>
+                  <th>Recommended Follow-up</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="recentActivityTbody">
+                <!-- Rendered dynamically via main.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ====================================================================
+           VIEW 2: 🎯 STUDENT RISK ASSESSMENT (MULTI-STEP WIZARD)
+           ==================================================================== -->
+      <section id="view-assessment" class="view-section" aria-labelledby="assessmentHeading">
+        
+        <div class="view-header">
+          <div class="header-title-group">
+            <h1 id="assessmentHeading">🎯 Student Risk Assessment</h1>
+            <p class="header-subtitle">
+              Multi-indicator formative assessment wizard. Enter verified academic and engagement metrics to simulate early risk detection.
+            </p>
+          </div>
+        </div>
+
+        <div class="card wizard-card">
+          
+          <!-- Stepper Progress Header -->
+          <div class="stepper-header">
+            <div class="stepper-track-wrap">
+              <div class="stepper-progress-bg">
+                <div class="stepper-progress-fill" id="stepperFill"></div>
+              </div>
+              <div class="stepper-steps-row">
+                <button class="step-node active" data-step-target="1" aria-label="Step 1: Student Demographics">
+                  <span class="step-circle">1</span>
+                  <span class="step-title">Demographics</span>
+                </button>
+                <button class="step-node" data-step-target="2" aria-label="Step 2: Academic Indicators">
+                  <span class="step-circle">2</span>
+                  <span class="step-title">Academics</span>
+                </button>
+                <button class="step-node" data-step-target="3" aria-label="Step 3: Engagement & Habits">
+                  <span class="step-circle">3</span>
+                  <span class="step-title">Engagement</span>
+                </button>
+                <button class="step-node" data-step-target="4" aria-label="Step 4: Summary Review">
+                  <span class="step-circle">4</span>
+                  <span class="step-title">Review</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wizard Form Container -->
+          <form id="studentAssessmentForm" novalidate onsubmit="return false;">
+            
+            <!-- STEP 1: DEMOGRAPHICS -->
+            <div class="wizard-form-step active-step" id="wizardStep1">
+              <h3 style="margin-bottom: 1.25rem;">Step 1: Student Reference & Cohort Context</h3>
+              
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <div class="form-label-row">
+                    <label for="studentRefInput" class="form-label">Student Reference / ID *</label>
+                    <button type="button" class="tooltip-trigger" title="Institutional unique identifier, e.g., STU-2026-099">(?)</button>
+                  </div>
+                  <input type="text" id="studentRefInput" class="form-control" placeholder="e.g. STU-2026-081" required>
+                  <span class="field-error-msg" id="studentRefError">Student Reference is required for assessment.</span>
+                </div>
+
+                <div class="form-group">
+                  <div class="form-label-row">
+                    <label for="studentAliasInput" class="form-label">Student Alias / Initials (Optional)</label>
+                    <button type="button" class="tooltip-trigger" title="De-identified initials used in aggregated reports">(?)</button>
+                  </div>
+                  <input type="text" id="studentAliasInput" class="form-control" placeholder="e.g. M.B.">
+                </div>
+
+                <div class="form-group">
+                  <label for="gradeLevelSelect" class="form-label">Grade / Cohort Level</label>
+                  <select id="gradeLevelSelect" class="form-control">
+                    <option value="Grade 10">Grade 10</option>
+                    <option value="Grade 11" selected>Grade 11</option>
+                    <option value="Grade 12">Grade 12</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="academicStreamSelect" class="form-label">Academic Program Track</label>
+                  <select id="academicStreamSelect" class="form-control">
+                    <option value="Science & Mathematics" selected>Science & Mathematics</option>
+                    <option value="Humanities & Social Sciences">Humanities & Social Sciences</option>
+                    <option value="Commerce & Economics">Commerce & Economics</option>
+                    <option value="Vocational & Applied Arts">Vocational & Applied Arts</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 2: ACADEMIC INDICATORS -->
+            <div class="wizard-form-step" id="wizardStep2">
+              <h3 style="margin-bottom: 1.25rem;">Step 2: Core Academic Indicators</h3>
+              
+              <div class="form-group">
+                <div class="form-label-row">
+                  <label for="internalTestScore" class="form-label">Formative Internal Test Score (0–100%)</label>
+                  <button type="button" class="tooltip-trigger" title="Average score on mid-term quizzes and unit assessments">(?)</button>
+                </div>
+                <div class="range-slider-wrap">
+                  <input type="range" id="internalTestScore" class="range-slider" min="0" max="100" value="65">
+                  <span class="range-val-badge" id="internalTestBadge">65%</span>
+                </div>
+                <span class="form-hint">Scores below 50% trigger subject-specific remedial support rules.</span>
+              </div>
+
+              <div class="form-group">
+                <div class="form-label-row">
+                  <label for="assignmentRate" class="form-label">Assignment Submission Frequency (0–100%)</label>
+                  <button type="button" class="tooltip-trigger" title="Percentage of mandatory coursework assignments submitted on time">(?)</button>
+                </div>
+                <div class="range-slider-wrap">
+                  <input type="range" id="assignmentRate" class="range-slider" min="0" max="100" value="75">
+                  <span class="range-val-badge" id="assignmentRateBadge">75%</span>
+                </div>
+                <span class="form-hint">Identified in literature as a top early warning indicator of academic disengagement.</span>
+              </div>
+
+              <div class="form-grid-2" style="margin-top: 1rem;">
+                <div class="form-group">
+                  <label for="priorGradeSelect" class="form-label">Prior Term Grade Level</label>
+                  <select id="priorGradeSelect" class="form-control">
+                    <option value="A">Grade A (85–100%)</option>
+                    <option value="B" selected>Grade B (70–84%)</option>
+                    <option value="C">Grade C (55–69%)</option>
+                    <option value="D">Grade D (40–54%)</option>
+                    <option value="F">Grade F (&lt; 40%)</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="subjectDifficultiesSelect" class="form-label">Primary Challenge Area</label>
+                  <select id="subjectDifficultiesSelect" class="form-control">
+                    <option value="Mathematics" selected>Mathematics</option>
+                    <option value="Sciences / Physics">Sciences / Physics</option>
+                    <option value="Languages & Literature">Languages & Literature</option>
+                    <option value="None / Broad Competency">None / Broad Competency</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 3: ENGAGEMENT & HABITS -->
+            <div class="wizard-form-step" id="wizardStep3">
+              <h3 style="margin-bottom: 1.25rem;">Step 3: Attendance & Study Engagement</h3>
+
+              <div class="form-group">
+                <div class="form-label-row">
+                  <label for="attendanceRate" class="form-label">Cumulative Attendance Rate (0–100%)</label>
+                  <button type="button" class="tooltip-trigger" title="Classroom attendance rate across the active semester">(?)</button>
+                </div>
+                <div class="range-slider-wrap">
+                  <input type="range" id="attendanceRate" class="range-slider" min="0" max="100" value="82">
+                  <span class="range-val-badge" id="attendanceRateBadge">82%</span>
+                </div>
+                <span class="form-hint">Statutory threshold: Rates below 70% require mandatory advisory intervention.</span>
+              </div>
+
+              <div class="form-group">
+                <div class="form-label-row">
+                  <label for="studyHours" class="form-label">Weekly Independent Study Hours</label>
+                  <button type="button" class="tooltip-trigger" title="Self-reported or logged study hours outside regular classroom instruction">(?)</button>
+                </div>
+                <div class="range-slider-wrap">
+                  <input type="range" id="studyHours" class="range-slider" min="0" max="40" step="0.5" value="8">
+                  <span class="range-val-badge" id="studyHoursBadge">8 hrs</span>
+                </div>
+                <span class="form-hint">Educational benchmarks suggest 8–15 hours/week for optimal academic stability.</span>
+              </div>
+
+              <div class="form-grid-2" style="margin-top: 1rem;">
+                <div class="form-group">
+                  <label for="tutoringSelect" class="form-label">Current Academic Support</label>
+                  <select id="tutoringSelect" class="form-control">
+                    <option value="none" selected>No supplemental tutoring</option>
+                    <option value="peer">Peer tutoring group</option>
+                    <option value="faculty">Faculty office hours</option>
+                    <option value="external">External private coaching</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="familySupportSelect" class="form-label">Family Academic Engagement</label>
+                  <select id="familySupportSelect" class="form-control">
+                    <option value="high">High engagement (Regular meetings)</option>
+                    <option value="moderate" selected>Moderate engagement</option>
+                    <option value="low">Low engagement / Hard to reach</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 4: REVIEW & SUBMIT -->
+            <div class="wizard-form-step" id="wizardStep4">
+              <h3 style="margin-bottom: 0.5rem;">Step 4: Summary Review & Simulation Run</h3>
+              <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                Review all indicator values before triggering the simulated risk evaluation and pedagogical recommendations.
+              </p>
+
+              <div id="reviewSummaryTable">
+                <!-- Injected dynamically via populateReviewSummary() -->
+              </div>
+            </div>
+
+            <!-- Wizard Navigation Footer -->
+            <div class="wizard-footer">
+              <button type="button" class="btn btn-secondary btn-sm" id="btnWizardReset">
+                🔄 Reset Form
+              </button>
+
+              <div style="display: flex; gap: 0.75rem;">
+                <button type="button" class="btn btn-secondary" id="btnWizardBack" style="visibility: hidden;">
+                  ← Back
+                </button>
+                <button type="button" class="btn btn-primary" id="btnWizardNext">
+                  Continue →
+                </button>
+                <button type="button" class="btn btn-primary" id="btnRunAssessment" style="display: none;">
+                  🚀 Run Demonstration Assessment
+                </button>
+              </div>
+            </div>
+
+          </form>
+
+        </div>
+
+        <!-- Demonstration Outcome Card -->
+        <div class="card assessment-outcome-card" id="assessmentOutcomeCard">
+          <!-- Populated dynamically via renderAssessmentOutcome() -->
+        </div>
+
+      </section>
+
+      <!-- ====================================================================
+           VIEW 3: 👥 STUDENTS DIRECTORY & COHORT
+           ==================================================================== -->
+      <section id="view-students" class="view-section" aria-labelledby="studentsHeading">
+        
+        <div class="view-header">
+          <div class="header-title-group">
+            <h1 id="studentsHeading">👥 Student Cohort Directory</h1>
+            <p class="header-subtitle">
+              Browse institutional student records, track risk categories, and inspect assigned pedagogical interventions.
+            </p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" id="btnOpenPrnModal">
+              <span>➕</span> Register Student (PRN)
+            </button>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 1.5rem;">
+          
+          <div class="table-toolbar">
+            <div class="search-box">
+              <span class="search-icon" aria-hidden="true">🔍</span>
+              <input type="text" id="studentsSearchInput" class="search-input" placeholder="Search by PRN, student name, or grade..." aria-label="Search student directory">
+            </div>
+
+            <div class="filter-pills-group" id="studentsFilterGroup" role="group" aria-label="Filter students by risk level">
+              <button class="filter-pill active" data-filter="all">All (142)</button>
+              <button class="filter-pill" data-filter="high">High Risk (18)</button>
+              <button class="filter-pill" data-filter="moderate">Moderate (28)</button>
+              <button class="filter-pill" data-filter="low">Low Risk (96)</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table" aria-label="Institutional student directory">
+              <thead>
+                <tr>
+                  <th>Student PRN / ID</th>
+                  <th>Student Name</th>
+                  <th>Cohort</th>
+                  <th>Attendance</th>
+                  <th>Test Score</th>
+                  <th>Study Hours</th>
+                  <th>Risk Tier</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody id="studentsDirectoryTbody">
+                <!-- Injected dynamically via renderStudentsDirectory() -->
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ====================================================================
+           VIEW 4: 📊 REPORTS & EXPORTS
+           ==================================================================== -->
+      <section id="view-reports" class="view-section" aria-labelledby="reportsHeading">
+        
+        <div class="view-header">
+          <div class="header-title-group">
+            <h1 id="reportsHeading">📊 Institutional Risk Reports & Analytics</h1>
+            <p class="header-subtitle">
+              Aggregated academic indicators, transition matrices, and exportable decision support documentation.
+            </p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary" id="btnDownloadCsv">
+              <span>📥</span> Download Demo CSV
+            </button>
+            <button class="btn btn-primary" id="btnPrintReport">
+              <span>🖨️</span> Print / Save PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Executive Summary Banner -->
+        <div class="card" style="margin-bottom: 1.5rem; border-left: 4px solid var(--accent-violet);">
+          <div class="card-header" style="border: none; margin-bottom: 0.5rem; padding: 0;">
+            <h3 class="card-title">
+              <span>📈</span> Term 2 Executive Synthesis
+            </h3>
+            <span class="demo-data-tag">DEMO DATA</span>
+          </div>
+          <p style="font-size: 0.95rem; color: var(--text-body); line-height: 1.6;">
+            Across Horizon High School’s 142 monitored students, early predictive screening identified <strong>18 students (12.7%)</strong> in the high-risk band. Proactive pedagogical intervention initiated within 10 days reduced attendance breaches by <strong>34%</strong> compared to the previous academic term.
+          </p>
+        </div>
+
+        <div class="charts-grid">
+          
+          <!-- Intervention Effectiveness Matrix -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <span>🎯</span> Pedagogical Intervention Resolution Rate
+              </h3>
+              <span class="demo-data-tag">DEMO DATA</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1rem; padding-top: 0.5rem;">
+              
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
+                  <span>Attendance Counseling (14 Assigned)</span>
+                  <strong>71.4% Resolved</strong>
+                </div>
+                <div style="height: 8px; background: var(--border-subtle); border-radius: var(--radius-full); overflow: hidden;">
+                  <div style="height: 100%; width: 71.4%; background: var(--teal-primary);"></div>
+                </div>
+              </div>
+
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
+                  <span>Mathematics Peer Tutoring (9 Assigned)</span>
+                  <strong>66.7% Resolved</strong>
+                </div>
+                <div style="height: 8px; background: var(--border-subtle); border-radius: var(--radius-full); overflow: hidden;">
+                  <div style="height: 100%; width: 66.7%; background: var(--teal-primary);"></div>
+                </div>
+              </div>
+
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
+                  <span>Study Hours Commitment Contract (6 Assigned)</span>
+                  <strong>83.3% Resolved</strong>
+                </div>
+                <div style="height: 8px; background: var(--border-subtle); border-radius: var(--radius-full); overflow: hidden;">
+                  <div style="height: 100%; width: 83.3%; background: var(--teal-primary);"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Academic Cohort Summary Table -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <span>🏫</span> Cohort Indicator Breakdown
+              </h3>
+              <span class="demo-data-tag">DEMO DATA</span>
+            </div>
+            <table class="data-table" style="font-size: 0.84rem;">
+              <thead>
+                <tr>
+                  <th>Cohort</th>
+                  <th>Students</th>
+                  <th>Avg Attendance</th>
+                  <th>Avg Test</th>
+                  <th>High-Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Grade 10</strong></td>
+                  <td>48</td>
+                  <td>86.2%</td>
+                  <td>73.5%</td>
+                  <td><span class="risk-badge low-risk">4 (8.3%)</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Grade 11</strong></td>
+                  <td>52</td>
+                  <td>83.4%</td>
+                  <td>69.8%</td>
+                  <td><span class="risk-badge high-risk">8 (15.4%)</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Grade 12</strong></td>
+                  <td>42</td>
+                  <td>84.8%</td>
+                  <td>70.4%</td>
+                  <td><span class="risk-badge moderate-risk">6 (14.3%)</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ====================================================================
+           VIEW 5: 🛠️ RESEARCH & ADMIN TOOLS (ROLE-AWARE DEMO)
+           ==================================================================== -->
+      <section id="view-admin" class="view-section" aria-labelledby="adminHeading">
+        
+        <div class="view-header">
+          <div class="header-title-group">
+            <h1 id="adminHeading">🛠️ Research, Benchmarking & System Administration</h1>
+            <p class="header-subtitle">
+              Formal model benchmarking, SHAP global feature importances, and deterministic intervention rule management.
+            </p>
+          </div>
+        </div>
+
+        <div class="outcome-alert-box" style="margin-bottom: 1.75rem;">
+          <strong>🔬 Demonstration Role View Notice:</strong> In the production EduRisk application, this administrative module is strictly restricted to Lead Researchers and System Administrators via server-side role validation. This white UI prototype displays the research interface for visual demonstration.
+        </div>
+
+        <!-- Literature Multi-Model Benchmark Table -->
+        <div class="card" style="margin-bottom: 1.75rem;">
+          <div class="card-header">
+            <h3 class="card-title">
+              <span>📊</span> Empirical Multi-Model Benchmark Results (UCI Cohort Holdout Set)
+            </h3>
+            <span class="demo-data-tag">FORMAL BENCHMARK</span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
+            Empirical benchmark metrics obtained from 5-fold Stratified K-Fold cross-validation and holdout test evaluation (130 test instances, 20 high-risk):
+          </p>
+
+          <div class="table-responsive">
+            <table class="data-table benchmark-table" aria-label="Multi-model benchmark comparison">
+              <thead>
+                <tr>
+                  <th>Classifier</th>
+                  <th>CV Macro F1</th>
+                  <th>Test Macro F1</th>
+                  <th>Test Accuracy</th>
+                  <th>High-Risk Recall</th>
+                  <th>False Negatives</th>
+                  <th>Train Time</th>
+                  <th>Inference Latency</th>
+                </tr>
+              </thead>
+              <tbody id="benchmarkTableTbody">
+                <!-- Injected dynamically via renderAdminView() -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Intervention Rules Engine Management -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <span>📋</span> Pedagogical Intervention Rules Engine
+            </h3>
+            <span class="demo-data-tag">DETERMINISTIC RULES</span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
+            Deterministic, rule-based mapping linking verified feature deficiencies to specific educator actions:
+          </p>
+
+          <div class="table-responsive">
+            <table class="data-table" aria-label="Intervention rules specification">
+              <thead>
+                <tr>
+                  <th>Rule ID</th>
+                  <th>Rule Name</th>
+                  <th>Trigger Condition</th>
+                  <th>Priority</th>
+                  <th>Assigned Pedagogical Action</th>
+                  <th>Lead Stakeholder</th>
+                </tr>
+              </thead>
+              <tbody id="rulesTableTbody">
+                <!-- Injected dynamically via renderAdminView() -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ========================================================================
+       STUDENT PROFILE DETAIL MODAL
+       ======================================================================== -->
+  <div class="modal-overlay" id="studentDetailModal" role="dialog" aria-modal="true" aria-labelledby="studentModalTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="studentModalTitle" class="card-title">Student Profile</h3>
+        <button class="modal-close-btn" id="modalCloseBtn" aria-label="Close modal dialog">✕</button>
+      </div>
+      <div class="modal-body" id="studentModalBody">
+        <!-- Rendered dynamically via openStudentModal() -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary btn-sm" id="modalDoneBtn">Done</button>
+      </div>
+    </div>
+  <!-- PRN-Based Student Registration Modal -->
+  <div class="modal-overlay" id="prnRegistrationModal" role="dialog" aria-modal="true" aria-labelledby="prnModalTitle">
+    <div class="modal-dialog" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3 id="prnModalTitle" class="card-title" style="display: flex; align-items: center; gap: 0.5rem;">
+          <span>📝</span> Persistent Student PRN Registration
+        </h3>
+        <button class="modal-close-btn" id="prnModalCloseBtn" aria-label="Close registration modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+          The Permanent Roll Number (PRN) is the stable, unique identifier for every student. Once registered, core profiles are preserved across terms and future risk assessments.
+        </p>
+
+        <!-- PRN Verification Step -->
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <div class="form-label-row">
+            <label for="regPrnInput" class="form-label">Permanent Roll Number (PRN) *</label>
+            <span style="font-size: 0.78rem; color: var(--teal-primary); font-weight: 600;">Unique Institutional ID</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="regPrnInput" class="form-control" placeholder="e.g. PRN-2026-009" style="text-transform: uppercase;">
+            <button type="button" class="btn btn-secondary" id="btnVerifyPrn" style="white-space: nowrap;">
+              🔍 Check PRN
+            </button>
+          </div>
+          <span class="field-error-msg" id="regPrnError">Please enter a valid PRN (e.g. PRN-2026-009).</span>
+        </div>
+
+        <!-- Existing Student Found Notification -->
+        <div id="prnExistingStudentAlert" class="outcome-alert-box" style="display: none; background-color: var(--teal-surface); border-color: var(--teal-border); color: var(--teal-primary);">
+          <strong>✅ Student Already Registered:</strong>
+          <div id="prnExistingDetails" style="margin-top: 0.35rem; font-size: 0.88rem; color: var(--text-body);"></div>
+          <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
+            <button type="button" class="btn btn-primary btn-sm" id="btnAssessExistingStudent">
+              🎯 Start Assessment for this Student
+            </button>
+          </div>
+        </div>
+
+        <!-- New Student Form -->
+        <form id="newStudentRegForm" style="display: none; margin-top: 1rem;">
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="regStudentName" class="form-label">Student Full Name *</label>
+              <input type="text" id="regStudentName" class="form-control" placeholder="e.g. Sophia Anderson" required>
+            </div>
+            <div class="form-group">
+              <label for="regEmail" class="form-label">Institutional Email</label>
+              <input type="email" id="regEmail" class="form-control" placeholder="e.g. s.anderson@horizon.edu">
+            </div>
+            <div class="form-group">
+              <label for="regGrade" class="form-label">Cohort / Grade Level</label>
+              <select id="regGrade" class="form-control">
+                <option value="Grade 10">Grade 10</option>
+                <option value="Grade 11" selected>Grade 11</option>
+                <option value="Grade 12">Grade 12</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="regSection" class="form-label">Class / Section</label>
+              <input type="text" id="regSection" class="form-control" placeholder="e.g. Class 11-A" value="Class 11-A">
+            </div>
+            <div class="form-group">
+              <label for="regStream" class="form-label">Program Track / Stream</label>
+              <select id="regStream" class="form-control">
+                <option value="Science & Mathematics" selected>Science & Mathematics</option>
+                <option value="Humanities & Social Sciences">Humanities & Social Sciences</option>
+                <option value="Commerce & Economics">Commerce & Economics</option>
+                <option value="Vocational & Applied Arts">Vocational & Applied Arts</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="regBatch" class="form-label">Admission Batch</label>
+              <input type="text" id="regBatch" class="form-control" placeholder="e.g. 2024–2026" value="2024–2026">
+            </div>
+          </div>
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btnCancelPrnModal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btnSubmitPrnReg" style="display: none;">
+          ✅ Complete One-Time Registration
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Notification Toast Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Anime.js Library: Local Offline Bundle with CDN Fallback -->
+  <script src="vendor/anime.min.js"></script>
+  <script>
+    if (typeof window.anime !== 'function') {
+      const cdnScript = document.createElement('script');
+      cdnScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js';
+      document.head.appendChild(cdnScript);
+    }
+  </script>
+
+  <!-- Prototype Scripts -->
+  <script src="data.js"></script>
+  <script src="animations.js"></script>
+  <script src="main.js"></script>
+
+</body>
+</html>

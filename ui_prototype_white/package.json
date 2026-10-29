@@ -1,0 +1,20 @@
+{
+  "name": "edurisk-ui-prototype-white",
+  "version": "1.0.0",
+  "description": "Modern, accessible White Theme UI Prototype for EduRisk XAI with Anime.js animations",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 3000 --directory .",
+    "serve": "npx -y serve . -p 3000"
+  },
+  "keywords": [
+    "edurisk",
+    "xai",
+    "white-theme",
+    "ui-prototype",
+    "animejs",
+    "accessible-ui"
+  ],
+  "author": "EduRisk XAI Design Team",
+  "license": "MIT"
+}
