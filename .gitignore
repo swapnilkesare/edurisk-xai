@@ -16,6 +16,7 @@ htmlcov/
 
 # Local databases and secrets
 *.db-journal
+*_backup*.db
 .env
 
 # Streamlit

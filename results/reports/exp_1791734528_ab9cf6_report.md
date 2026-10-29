@@ -1,0 +1,25 @@
+# EduRisk XAI — Experimental Evaluation Report
+
+- **Experiment ID**: `exp_1791734528_ab9cf6`
+- **Execution Timestamp**: `2026-10-11 21:32:08`
+- **Dataset**: UCI Student Performance (Augmented) (Fingerprint: `396e1d5d8ecf1bc5`)
+- **Synthetic Flag**: Real Benchmark Data
+- **Samples**: Train = 96, Test = 24
+- **Selected Optimal Model**: **Decision Tree**
+
+### Selection Policy Rationale
+> Selected Decision Tree based on highest Cross-Validation Macro F1 (0.7864) across 4 evaluated candidate pipelines.
+
+### Comparative Performance Matrix
+
+| Model | CV Macro F1 | Test Macro F1 | Test Acc | High-Risk Recall | False Negatives | Train Time (s) | Latency (ms) |
+|---|---|---|---|---|---|---|---|
+| Decision Tree | 0.7864 | 0.8884 | 0.9583 | 0.6667 | 1 | 1.74s | 5.87ms |
+| Support Vector Classifier | 0.6291 | 0.7491 | 0.8750 | 0.6667 | 1 | 1.05s | 6.78ms |
+| Logistic Regression | 0.6453 | 0.7491 | 0.8750 | 0.6667 | 1 | 0.52s | 5.20ms |
+| Random Forest | 0.5357 | 0.7273 | 0.9167 | 0.3333 | 2 | 3.82s | 9.76ms |
+
+### Research Integrity Notes
+1. **Holdout Independence**: The test set was strictly quarantined prior to preprocessing and SMOTE resampling.
+2. **Resampling Isolation**: SMOTE was executed exclusively within training cross-validation folds.
+3. **Lightweight Deployment**: All pipelines operated on consumer CPU without GPU dependencies.

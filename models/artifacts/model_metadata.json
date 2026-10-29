@@ -1,6 +1,6 @@
 {
-  "experiment_id": "exp_1791732424_d6735e",
-  "model_version": "v_20261011_205704",
+  "experiment_id": "exp_1791955689_1eaded",
+  "model_version": "v_20261014_105809",
   "selected_model": "Decision Tree",
   "selection_rationale": "Selected Decision Tree based on highest Cross-Validation Macro F1 (0.7864) across 4 evaluated candidate pipelines.",
   "dataset": {
@@ -28,8 +28,8 @@
       "test_high_risk_recall": 0.6667,
       "test_roc_auc": 0.8333,
       "false_negatives": 1,
-      "training_duration": 1.5142,
-      "inference_latency_ms": 4.748,
+      "training_duration": 1.5216,
+      "inference_latency_ms": 4.8674,
       "model_size_kb": 10.84,
       "best_params": {
         "classifier__criterion": "entropy",
@@ -45,8 +45,8 @@
       "test_high_risk_recall": 0.6667,
       "test_roc_auc": 0.8889,
       "false_negatives": 1,
-      "training_duration": 0.8585,
-      "inference_latency_ms": 7.2318,
+      "training_duration": 0.9612,
+      "inference_latency_ms": 4.8787,
       "model_size_kb": 19.03,
       "best_params": {
         "classifier__C": 10.0,
@@ -61,8 +61,8 @@
       "test_high_risk_recall": 0.6667,
       "test_roc_auc": 0.9206,
       "false_negatives": 1,
-      "training_duration": 0.5008,
-      "inference_latency_ms": 4.9719,
+      "training_duration": 0.484,
+      "inference_latency_ms": 4.8551,
       "model_size_kb": 9.79,
       "best_params": {
         "classifier__C": 10.0,
@@ -78,8 +78,8 @@
       "test_high_risk_recall": 0.3333,
       "test_roc_auc": 1.0,
       "false_negatives": 2,
-      "training_duration": 3.6859,
-      "inference_latency_ms": 8.5679,
+      "training_duration": 3.7208,
+      "inference_latency_ms": 9.0301,
       "model_size_kb": 194.55,
       "best_params": {
         "classifier__max_depth": 4,
@@ -112,6 +112,6 @@
     "internal_test_score",
     "assignment_submission_frequency"
   ],
-  "timestamp": "2026-10-11 20:57:04",
+  "timestamp": "2026-10-14 10:58:09",
   "artifact_path": "C:\\Users\\Swapnil G Kesare\\Downloads\\AI LAB FOLDER\\MANUSCRIPT\\PROJECT\\edurisk-xai\\models\\artifacts\\best_model.pkl"
 }

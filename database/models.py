@@ -63,12 +63,18 @@ class Student(Base):
     __tablename__ = "students"
 
     id = Column(Integer, primary_key=True, index=True)
-    student_identifier = Column(String(64), unique=True, index=True, nullable=False)
+    student_identifier = Column(String(64), index=True, nullable=False)
+    prn = Column(String(64), index=True, nullable=True)  # Normalized Permanent Roll Number
     name = Column(String(128), nullable=False)
+    email = Column(String(128), nullable=True)
     course = Column(String(64), default="Computer Science & AI")
     department = Column(String(64), default="Engineering")
+    batch_year = Column(String(32), default="2024–2028")
     semester = Column(Integer, default=3)
     year = Column(Integer, default=2)
+    division = Column(String(16), default="A")
+    enrollment_status = Column(String(32), default="Active")
+    academic_history = Column(JSON, nullable=True)
     organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
     created_by_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

@@ -1,0 +1,117 @@
+{
+  "experiment_id": "exp_1791950536_8fbd41",
+  "model_version": "v_20261014_093216",
+  "selected_model": "Decision Tree",
+  "selection_rationale": "Selected Decision Tree based on highest Cross-Validation Macro F1 (0.7864) across 4 evaluated candidate pipelines.",
+  "dataset": {
+    "source_type": "REAL_PUBLIC",
+    "name": "UCI Student Performance (Augmented)",
+    "path": "C:\\Users\\Swapnil G Kesare\\Downloads\\AI LAB FOLDER\\MANUSCRIPT\\PROJECT\\edurisk-xai\\data\\raw\\student_data.csv",
+    "row_count": 649,
+    "feature_count": 22,
+    "fingerprint": "396e1d5d8ecf1bc5",
+    "is_synthetic": false,
+    "description": "UCI Portuguese Secondary Student Performance Dataset (Cortez & Silva, 2008) with methodology alignment.",
+    "target_distribution": {
+      "0": 549,
+      "1": 100
+    }
+  },
+  "train_samples": 96,
+  "test_samples": 24,
+  "models": {
+    "Decision Tree": {
+      "cv_macro_f1": 0.7864,
+      "cv_macro_f1_std": 0.1393,
+      "test_accuracy": 0.9583,
+      "test_macro_f1": 0.8884,
+      "test_high_risk_recall": 0.6667,
+      "test_roc_auc": 0.8333,
+      "false_negatives": 1,
+      "training_duration": 1.5213,
+      "inference_latency_ms": 4.7966,
+      "model_size_kb": 10.84,
+      "best_params": {
+        "classifier__criterion": "entropy",
+        "classifier__max_depth": 3,
+        "classifier__min_samples_split": 2
+      }
+    },
+    "Support Vector Classifier": {
+      "cv_macro_f1": 0.6291,
+      "cv_macro_f1_std": 0.1626,
+      "test_accuracy": 0.875,
+      "test_macro_f1": 0.7491,
+      "test_high_risk_recall": 0.6667,
+      "test_roc_auc": 0.8889,
+      "false_negatives": 1,
+      "training_duration": 0.8425,
+      "inference_latency_ms": 7.1807,
+      "model_size_kb": 19.03,
+      "best_params": {
+        "classifier__C": 10.0,
+        "classifier__kernel": "linear"
+      }
+    },
+    "Logistic Regression": {
+      "cv_macro_f1": 0.6453,
+      "cv_macro_f1_std": 0.176,
+      "test_accuracy": 0.875,
+      "test_macro_f1": 0.7491,
+      "test_high_risk_recall": 0.6667,
+      "test_roc_auc": 0.9206,
+      "false_negatives": 1,
+      "training_duration": 0.4817,
+      "inference_latency_ms": 4.8715,
+      "model_size_kb": 9.79,
+      "best_params": {
+        "classifier__C": 10.0,
+        "classifier__max_iter": 1000,
+        "classifier__solver": "lbfgs"
+      }
+    },
+    "Random Forest": {
+      "cv_macro_f1": 0.5357,
+      "cv_macro_f1_std": 0.1422,
+      "test_accuracy": 0.9167,
+      "test_macro_f1": 0.7273,
+      "test_high_risk_recall": 0.3333,
+      "test_roc_auc": 1.0,
+      "false_negatives": 2,
+      "training_duration": 4.4128,
+      "inference_latency_ms": 9.6761,
+      "model_size_kb": 194.55,
+      "best_params": {
+        "classifier__max_depth": 4,
+        "classifier__min_samples_split": 2,
+        "classifier__n_estimators": 100
+      }
+    }
+  },
+  "feature_columns": [
+    "sex",
+    "age",
+    "address",
+    "famsize",
+    "Pstatus",
+    "Medu",
+    "Fedu",
+    "traveltime",
+    "failures",
+    "schoolsup",
+    "famsup",
+    "activities",
+    "internet",
+    "romantic",
+    "goout",
+    "Dalc",
+    "Walc",
+    "health",
+    "attendance_rate",
+    "study_hours",
+    "internal_test_score",
+    "assignment_submission_frequency"
+  ],
+  "timestamp": "2026-10-14 09:32:16",
+  "artifact_path": "C:\\Users\\Swapnil G Kesare\\Downloads\\AI LAB FOLDER\\MANUSCRIPT\\PROJECT\\edurisk-xai\\models\\artifacts\\best_model.pkl"
+}

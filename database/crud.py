@@ -1,10 +1,11 @@
 """
 Database CRUD Operations and Transaction Helpers for EduRisk XAI
 """
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple, Union
+import re
 from datetime import datetime
 from sqlalchemy.orm import Session
-
+from sqlalchemy import or_
 from database.models import (
     Student, AcademicRecord, BehaviorRecord, Prediction,
     SHAPExplanation, Intervention, InterventionRule, ModelRun, DatasetImport
@@ -36,6 +37,178 @@ def get_all_rules(db: Session, active_only: bool = True) -> List[InterventionRul
     return query.all()
 
 
+def normalize_prn(raw_prn: str) -> str:
+    """
+    Normalizes Permanent Roll Number (PRN):
+    - Trims leading and trailing whitespace
+    - Converts to uppercase
+    - Preserves meaningful internal separators and leading zeros
+    """
+    if not raw_prn:
+        return ""
+    # Strip whitespace, collapse multi-spaces, and uppercase
+    cleaned = raw_prn.strip()
+    return cleaned.upper()
+
+
+def validate_prn(prn: str) -> Tuple[bool, str]:
+    """
+    Validates PRN format according to institutional policy:
+    - Must be between 2 and 48 characters
+    - Alphanumeric with permitted institutional hyphens, slashes, or underscores
+    - Cannot be purely blank or contain invalid control characters
+    """
+    normalized = normalize_prn(prn)
+    if not normalized:
+        return False, "PRN cannot be empty."
+    if len(normalized) < 2:
+        return False, "PRN must be at least 2 characters long."
+    if len(normalized) > 48:
+        return False, "PRN cannot exceed 48 characters."
+    if not re.match(r"^[A-Z0-9_\-\/\.]+$", normalized):
+        return False, "PRN may only contain letters, numbers, hyphens, slashes, and periods."
+    return True, ""
+
+
+def get_student_by_prn(
+    db: Session,
+    prn_or_id: str,
+    organization_id: Optional[int] = None
+) -> Optional[Student]:
+    """
+    Finds a student by normalized PRN or legacy identifier.
+    Respects institutional organization scoping if organization_id is provided.
+    """
+    norm = normalize_prn(prn_or_id)
+    if not norm:
+        return None
+
+    query = db.query(Student).filter(
+        or_(
+            Student.prn == norm,
+            Student.student_identifier == norm,
+            Student.student_identifier == prn_or_id.strip()
+        )
+    )
+    if organization_id is not None:
+        query = query.filter(
+            or_(
+                Student.organization_id == organization_id,
+                Student.organization_id == None
+            )
+        )
+    return query.first()
+
+
+def register_student_prn(
+    db: Session,
+    prn: str,
+    name: str,
+    course: str = "Computer Science & AI",
+    department: str = "Engineering",
+    semester: int = 3,
+    year: int = 2,
+    batch_year: str = "2024–2028",
+    division: str = "A",
+    email: Optional[str] = None,
+    organization_id: Optional[int] = None,
+    created_by_user_id: Optional[int] = None,
+) -> Tuple[Optional[Student], bool, str]:
+    """
+    Persistent, One-Time Student Registration workflow using PRN as unique identifier.
+    Guarantees:
+    - PRN is validated and normalized
+    - Uniqueness enforced within organization scope
+    - Atomic database commit with rollback on conflict
+    Returns (student, is_newly_registered, message).
+    """
+    norm_prn = normalize_prn(prn)
+    is_valid, err_msg = validate_prn(norm_prn)
+    if not is_valid:
+        return None, False, err_msg
+
+    if not name or not name.strip():
+        return None, False, "Student full name is required."
+
+    clean_name = name.strip()
+
+    # Check for existing student within scope
+    existing = get_student_by_prn(db, norm_prn, organization_id=organization_id)
+    if existing:
+        return existing, False, f"Student with PRN '{norm_prn}' is already registered in this organization."
+
+    try:
+        new_student = Student(
+            prn=norm_prn,
+            student_identifier=norm_prn,  # Synchronized for legacy reference compatibility
+            name=clean_name,
+            course=course.strip() if course else "Computer Science & AI",
+            department=department.strip() if department else "Engineering",
+            semester=int(semester),
+            year=int(year),
+            batch_year=batch_year.strip() if batch_year else "2024–2028",
+            division=division.strip() if division else "A",
+            email=email.strip().lower() if email else None,
+            enrollment_status="Active",
+            academic_history=[],
+            organization_id=organization_id,
+            created_by_user_id=created_by_user_id,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow()
+        )
+        db.add(new_student)
+        db.commit()
+        db.refresh(new_student)
+        return new_student, True, f"Successfully registered student {clean_name} (PRN: {norm_prn})."
+    except Exception as e:
+        db.rollback()
+        return None, False, f"Database transaction failed during registration: {str(e)}"
+
+
+def update_student_academic_placement(
+    db: Session,
+    student_id: int,
+    new_semester: Optional[int] = None,
+    new_course: Optional[str] = None,
+    new_department: Optional[str] = None,
+    new_division: Optional[str] = None,
+    note: Optional[str] = None
+) -> Optional[Student]:
+    """
+    Updates academic placement (semester, course, section) without duplicating the student record.
+    Appends the transition snapshot to the student's auditable academic_history log.
+    """
+    student = db.query(Student).filter(Student.id == student_id).first()
+    if not student:
+        return None
+
+    history_entry = {
+        "timestamp": datetime.utcnow().isoformat(),
+        "previous_semester": student.semester,
+        "previous_course": student.course,
+        "previous_division": student.division,
+        "note": note or "Academic progression update"
+    }
+
+    history = list(student.academic_history or [])
+    history.append(history_entry)
+    student.academic_history = history
+
+    if new_semester is not None:
+        student.semester = int(new_semester)
+    if new_course is not None:
+        student.course = new_course.strip()
+    if new_department is not None:
+        student.department = new_department.strip()
+    if new_division is not None:
+        student.division = new_division.strip()
+
+    student.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(student)
+    return student
+
+
 def get_or_create_student(
     db: Session,
     student_identifier: str,
@@ -43,11 +216,16 @@ def get_or_create_student(
     organization_id: Optional[int] = None,
     created_by_user_id: Optional[int] = None,
 ) -> Student:
-    student = db.query(Student).filter(Student.student_identifier == student_identifier).first()
+    """
+    Backward-compatible student retrieval/creation helper with PRN synchronization.
+    """
+    norm = normalize_prn(student_identifier)
+    student = get_student_by_prn(db, norm, organization_id=organization_id)
     if not student:
         student = Student(
+            prn=norm,
             student_identifier=student_identifier,
-            name=name or f"Student {student_identifier}",
+            name=name or f"Student {norm}",
             organization_id=organization_id,
             created_by_user_id=created_by_user_id,
             created_at=datetime.utcnow()
@@ -181,8 +359,15 @@ def log_model_run(db: Session, run_data: Dict[str, Any]) -> ModelRun:
     return run
 
 
-def get_student_history(db: Session, student_identifier: str) -> List[Prediction]:
-    """Retrieves longitudinal prediction history for a specific student."""
-    return db.query(Prediction).filter(
-        Prediction.student_identifier == student_identifier
-    ).order_by(Prediction.prediction_timestamp.asc()).all()
+def get_student_history(db: Session, student_ref: Union[int, str]) -> List[Prediction]:
+    """Retrieves longitudinal prediction history for a specific student by ID or PRN."""
+    if isinstance(student_ref, int):
+        return db.query(Prediction).filter(
+            or_(Prediction.student_id == student_ref, Prediction.student_identifier == str(student_ref))
+        ).order_by(Prediction.prediction_timestamp.asc()).all()
+    else:
+        norm = normalize_prn(str(student_ref))
+        return db.query(Prediction).filter(
+            or_(Prediction.student_identifier == norm, Prediction.student_identifier == str(student_ref))
+        ).order_by(Prediction.prediction_timestamp.asc()).all()
+

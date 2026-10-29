@@ -104,7 +104,7 @@ if st.session_state.current_user is None:
     with col_login:
         with st.container():
             st.markdown(f"""
-            <div style="background-color: {COLOR_BG_CARD}; border: 1px solid {COLOR_BORDER}; border-radius: 12px; padding: 1.75rem; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+            <div style="background-color: {COLOR_BG_CARD}; border: 1px solid {COLOR_BORDER}; border-radius: 12px; padding: 1.75rem; margin-bottom: 1.5rem; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);">
                 <h3 style="color: {COLOR_TEXT_PRIMARY}; margin-top: 0; font-size: 1.3rem;">🔐 Sign In to Your Academic Account</h3>
                 <p style="color: {COLOR_TEXT_SECONDARY}; font-size: 0.95rem; line-height: 1.5; margin-bottom: 0;">
                     Access authorized student records, risk indicators, and intervention recommendations.
